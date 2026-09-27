@@ -124,8 +124,9 @@ class DeterministicAnalyzer:
         *,
         as_of: datetime,
         received_as_of: datetime,
+        scenario_run_id: str | None = None,
     ) -> AnalysisBundle:
-        bundle, _ = self._calculate(observations, asset, policy, as_of, received_as_of)
+        bundle, _ = self._calculate(observations, asset, policy, as_of, received_as_of, scenario_run_id)
         return bundle
 
     def analyze_series(
@@ -136,9 +137,10 @@ class DeterministicAnalyzer:
         *,
         as_of: datetime,
         received_as_of: datetime,
+        scenario_run_id: str | None = None,
     ) -> tuple[AnalysisBundle, list[SeriesPoint]]:
         """Return the analysis and its historical points from one calculation pass."""
-        return self._calculate(observations, asset, policy, as_of, received_as_of)
+        return self._calculate(observations, asset, policy, as_of, received_as_of, scenario_run_id)
 
     def _calculate(
         self,
@@ -147,6 +149,7 @@ class DeterministicAnalyzer:
         policy: DiagnosticPolicy,
         as_of: datetime,
         received_as_of: datetime,
+        scenario_run_id: str | None = None,
     ) -> tuple[AnalysisBundle, list[SeriesPoint]]:
         as_of, received_as_of = _utc(as_of), _utc(received_as_of)
         accepted = [
@@ -162,9 +165,16 @@ class DeterministicAnalyzer:
         selected = sorted(unique.values(), key=lambda m: (m.eventTime, m.sourceId))
         snapshot = [m.model_dump(mode="json") for m in selected]
         input_hash = _hash(snapshot)
-        analysis_id = "analysis-" + input_hash[:24]
         run_ids = {m.scenarioRunId for m in selected}
-        run_id = next(iter(run_ids)) if len(run_ids) == 1 else "unknown-run"
+        if scenario_run_id is not None and run_ids - {scenario_run_id}:
+            raise ValueError("observations do not belong to scenario_run_id")
+        run_id = scenario_run_id or (next(iter(run_ids)) if len(run_ids) == 1 else "unknown-run")
+        analysis_id = "analysis-" + _hash({
+            "input": input_hash, "asOf": as_of.isoformat(),
+            "receivedAsOf": received_as_of.isoformat(), "run": run_id,
+            "asset": asset.model_dump(mode="json"), "model": MODEL_VERSION,
+            "policy": policy.model_dump(mode="json"),
+        })[:24]
         window_end = max((m.eventTime for m in selected), default=min(as_of, received_as_of))
         window_start = min((m.eventTime for m in selected), default=window_end)
         window = InputWindow(start=window_start, end=window_end, replayReceivedAt=received_as_of)
@@ -249,10 +259,8 @@ class DeterministicAnalyzer:
             failureProbability=None,
         )
         persistence = self._persistence(points, policy.detection.residualWatchC, as_of)
-        clear_persistence = self._persistence_below(points, policy.detection.clearResidualC, as_of)
-        ever_watch = any(p.residualC is not None and p.residualC >= policy.detection.residualWatchC for p in points)
         watch = persistence >= policy.detection.persistMinutes
-        hysteresis_review = ever_watch and clear_persistence < policy.detection.clearPersistMinutes
+        hysteresis_review = self._episode_active(points, policy)
         status = "insufficient_data" if not sufficient else (
             "requires_review" if watch or hysteresis_review else "normal"
         )
@@ -443,3 +451,21 @@ class DeterministicAnalyzer:
                 break
             start = point.eventTime
         return (end - start).total_seconds() / 60
+
+    def _episode_active(self, points: list[SeriesPoint], policy: DiagnosticPolicy) -> bool:
+        active = False
+        high_start = low_start = previous = None
+        for point in points:
+            if previous is None or (point.eventTime - previous).total_seconds() > SYNC_SECONDS:
+                high_start = low_start = None
+            previous = point.eventTime
+            if point.residualC is None or point.quality != "good":
+                high_start = low_start = None
+                continue
+            high_start = (high_start or point.eventTime) if point.residualC >= policy.detection.residualWatchC else None
+            low_start = (low_start or point.eventTime) if point.residualC < policy.detection.clearResidualC else None
+            if high_start is not None and (point.eventTime-high_start).total_seconds()/60 >= policy.detection.persistMinutes:
+                active = True
+            if low_start is not None and (point.eventTime-low_start).total_seconds()/60 >= policy.detection.clearPersistMinutes:
+                active = False
+        return active

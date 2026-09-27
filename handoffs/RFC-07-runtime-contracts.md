@@ -7,3 +7,5 @@ Health расширен stage=integrated, businessRuntime=ready/degraded; founda
 GET /api/v1/work-plans: Envelope[Page[WorkPlan]], run required, caseId optional, limit/offset. Нужен для восстановления списка после reload/другим пользователем. Backend owner реализует; интегратор экспортирует контракт. Никаких временных DTO.
 
 Без изменения численной семантики AnalysisResult0.1.0. failureProbability=null, management equipment запрещено. Проверка: contract tests/drift, integration queued->ready/failed, HTTP plans list access/run isolation.
+
+Независимый numerical review выявил необходимость контекста пустого среза: NumericalAnalyzer.analyze и analyze_series принимают optional scenario_run_id; runtime всегда передает его, чтобы отсутствие наблюдений давало корректный unknown snapshot данного run. Непустые наблюдения другого run отклоняются. Analysis identity включает полный asset/policy/model и оба cutoff времени; inputSnapshotHash остается хешем входных наблюдений. Hysteresis активируется только после выдержанного persistMinutes эпизода, не одиночного превышения.

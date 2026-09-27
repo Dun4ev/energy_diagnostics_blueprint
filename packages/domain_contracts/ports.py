@@ -35,6 +35,7 @@ class NumericalAnalyzer(Protocol):
         *,
         as_of: datetime,
         received_as_of: datetime,
+        scenario_run_id: str | None = None,
     ) -> AnalysisBundle: ...
 
 
