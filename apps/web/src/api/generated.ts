@@ -368,7 +368,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** Plans */
+        get: operations["plans_api_v1_work_plans_get"];
         put?: never;
         /** Create Plan */
         post: operations["create_plan_api_v1_work_plans_post"];
@@ -1110,6 +1111,29 @@ export interface components {
              */
             schemaVersion: "0.1.0";
         };
+        /** Envelope[Page[WorkPlan]] */
+        "Envelope[Page[WorkPlan]]": {
+            data: components["schemas"]["Page_WorkPlan_"];
+            /**
+             * Datatime
+             * Format: date-time
+             */
+            dataTime: string;
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: "reference" | "simulation";
+            /** Requestid */
+            requestId: string;
+            /** Scenariorunid */
+            scenarioRunId: string;
+            /**
+             * Schemaversion
+             * @constant
+             */
+            schemaVersion: "0.1.0";
+        };
         /** Envelope[ScenarioSession] */
         "Envelope[ScenarioSession]": {
             data: components["schemas"]["ScenarioSession"];
@@ -1435,6 +1459,29 @@ export interface components {
         /** Envelope[Page[Source]] */
         Envelope_Page_Source__: {
             data: components["schemas"]["Page_Source_"];
+            /**
+             * Datatime
+             * Format: date-time
+             */
+            dataTime: string;
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: "reference" | "simulation";
+            /** Requestid */
+            requestId: string;
+            /** Scenariorunid */
+            scenarioRunId: string;
+            /**
+             * Schemaversion
+             * @constant
+             */
+            schemaVersion: "0.1.0";
+        };
+        /** Envelope[Page[WorkPlan]] */
+        Envelope_Page_WorkPlan__: {
+            data: components["schemas"]["Page_WorkPlan_"];
             /**
              * Datatime
              * Format: date-time
@@ -1907,6 +1954,17 @@ export interface components {
             /** Total */
             total: number;
         };
+        /** Page[WorkPlan] */
+        "Page[WorkPlan]": {
+            /** Items */
+            items: components["schemas"]["WorkPlan"][];
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+            /** Total */
+            total: number;
+        };
         /** Page[AnalysisBundle] */
         Page_AnalysisBundle_: {
             /** Items */
@@ -2010,6 +2068,17 @@ export interface components {
         Page_Source_: {
             /** Items */
             items: components["schemas"]["Source"][];
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+            /** Total */
+            total: number;
+        };
+        /** Page[WorkPlan] */
+        Page_WorkPlan_: {
+            /** Items */
+            items: components["schemas"]["WorkPlan"][];
             /** Limit */
             limit: number;
             /** Offset */
@@ -4078,6 +4147,85 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_Page_Source__"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["APIError"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["APIError"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["APIError"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["APIError"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["APIError"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["APIError"];
+                };
+            };
+        };
+    };
+    plans_api_v1_work_plans_get: {
+        parameters: {
+            query: {
+                caseId?: string | null;
+                limit?: number;
+                offset?: number;
+                scenarioRunId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_Page_WorkPlan__"];
                 };
             };
             /** @description Unauthorized */
