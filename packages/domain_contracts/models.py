@@ -583,6 +583,9 @@ class ScenarioSession(DTO):
     speed: Speed
     paused: StrictBool
     revision: Revision
+    processingStatus: Literal["queued", "running", "ready", "failed"] = "ready"
+    processingError: Text | None = None
+    processedAt: Time | None = None
 
 
 class ModelInfo(DTO):
@@ -725,9 +728,9 @@ class SessionAdvance(DTO):
 
 class Health(DTO):
     status: Literal["ok", "degraded"]
-    stage: Literal["foundation"]
+    stage: Literal["foundation", "integrated"]
     database: Literal["ready", "unavailable", "unconfigured"]
-    businessRuntime: Literal["not_implemented"]
+    businessRuntime: Literal["not_implemented", "ready", "degraded"]
     advisoryOnly: TrueFlag
     controlCommandsAllowed: FalseFlag
     externalAiEnabled: FalseFlag

@@ -2947,7 +2947,11 @@
             "type": "boolean"
           },
           "businessRuntime": {
-            "const": "not_implemented",
+            "enum": [
+              "not_implemented",
+              "ready",
+              "degraded"
+            ],
             "title": "Businessruntime",
             "type": "string"
           },
@@ -2971,7 +2975,10 @@
             "type": "boolean"
           },
           "stage": {
-            "const": "foundation",
+            "enum": [
+              "foundation",
+              "integrated"
+            ],
             "title": "Stage",
             "type": "string"
           },
@@ -4939,6 +4946,44 @@
           "paused": {
             "title": "Paused",
             "type": "boolean"
+          },
+          "processedAt": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Processedat"
+          },
+          "processingError": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Processingerror"
+          },
+          "processingStatus": {
+            "default": "ready",
+            "enum": [
+              "queued",
+              "running",
+              "ready",
+              "failed"
+            ],
+            "title": "Processingstatus",
+            "type": "string"
           },
           "replayReceivedAt": {
             "format": "date-time",

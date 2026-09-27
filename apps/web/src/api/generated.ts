@@ -1610,9 +1610,9 @@ export interface components {
             advisoryOnly: true;
             /**
              * Businessruntime
-             * @constant
+             * @enum {string}
              */
-            businessRuntime: "not_implemented";
+            businessRuntime: "not_implemented" | "ready" | "degraded";
             /**
              * Controlcommandsallowed
              * @constant
@@ -1630,9 +1630,9 @@ export interface components {
             externalAiEnabled: false;
             /**
              * Stage
-             * @constant
+             * @enum {string}
              */
-            stage: "foundation";
+            stage: "foundation" | "integrated";
             /**
              * Status
              * @enum {string}
@@ -2236,6 +2236,22 @@ export interface components {
             mode: "reference" | "simulation";
             /** Paused */
             paused: boolean;
+            /**
+             * Processedat
+             * @default null
+             */
+            processedAt: string | null;
+            /**
+             * Processingerror
+             * @default null
+             */
+            processingError: string | null;
+            /**
+             * Processingstatus
+             * @default ready
+             * @enum {string}
+             */
+            processingStatus: "queued" | "running" | "ready" | "failed";
             /**
              * Replayreceivedat
              * Format: date-time
