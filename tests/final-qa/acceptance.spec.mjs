@@ -167,7 +167,7 @@ test('independent live UI and API acceptance', async ({ browser }) => {
   await screen(page, 'not-found-1440');
   await page.route('**/api/v1/models?*', async route => { await new Promise(resolve => setTimeout(resolve, 900)); await route.continue(); });
   await page.goto(`/models-and-data?run=${simulationRun}`);
-  await expect(page.getByText('Загружаем данные...')).toBeVisible();
+  await expect(page.locator('.panel').filter({ has: page.getByRole('heading', { name: 'Численные модели' }) }).getByText('Загружаем данные...')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Модели и данные' })).toBeVisible();
   await page.unroute('**/api/v1/models?*');
   expect(badResponses).toEqual([]);
