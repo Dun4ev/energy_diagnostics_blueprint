@@ -200,7 +200,6 @@ def test_analysis_identity_tracks_policy_calibration_and_run_context():
         evaluate(observations, scenario_run_id="wrong-run")
 
 
-@pytest.mark.xfail(strict=True, reason="watch persistence bridges a disputed residual point")
 def test_disputed_midpoint_breaks_sixty_minute_persistence():
     observations = samples()
     for minute in range(5, 70, 5):

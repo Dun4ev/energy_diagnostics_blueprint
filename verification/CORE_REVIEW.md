@@ -1,6 +1,6 @@
 # Независимая численная проверка этапа 03
 
-Проверялся baseline интеграции `d063f2a23900d83242bb60067acacccbbc87449b` без изменения production. Затем для повторной проверки в QA worktree cherry-pick исправления интегратора `13a7c38` как `6c3b668`. Это проверка синтетического ядра, не оценка точности на реальном оборудовании и не полная приемка G4.
+Проверялся baseline интеграции `d063f2a23900d83242bb60067acacccbbc87449b` без изменения production. Затем для повторной проверки в QA worktree cherry-pick исправлений интегратора `13a7c38` как `6c3b668` и `f0da3c9` как `6b3d9d6`. Это проверка синтетического ядра, не оценка точности на реальном оборудовании и не полная приемка G4.
 
 ## Проверки и результаты
 
@@ -10,7 +10,7 @@
 
 Исправление `13a7c38` закрыло эти три регрессии: после снятия xfail проверка дала `7 passed`. `inputSnapshotHash` остался хешем наблюдений; `analysisRunId` стал зависеть от полного контекста расчета. Пустой вход теперь принимает явный `scenario_run_id`, а несовпадающие измерения отклоняются. Hysteresis активируется после выдержки порога.
 
-Остался дефект **P2, pending**: при 5-минутных показаниях с превышением порога на интервале60мин спорная точка посередине получает `quality=suspect, residualC=null`, но `_persistence` фильтрует ее и соединяет соседние валидные точки через 10мин. Фактически `persistenceMinutes=60.0`, `status=requires_review`, `risk=3.5`. Длительность не должна включать исключенный спорный интервал согласно консервативной трактовке доказательств. Регрессия `test_disputed_midpoint_breaks_sixty_minute_persistence` пока strict xfail: `7 passed, 1 xfailed`. Интегратору направлен reproducer; после исправления снять xfail и повторить.
+Дополнительно выявлен дефект **P2, исправлен `f0da3c9`**: при 5-минутных показаниях с превышением порога на интервале60мин спорная точка посередине получала `quality=suspect, residualC=null`, но `_persistence` фильтровал ее и соединял соседние валидные точки через 10мин. До исправления получалось `persistenceMinutes=60.0`, `status=requires_review`, `risk=3.5`. Исправление прерывает непрерывность на спорном/отсутствующем residual. Регрессия `test_disputed_midpoint_breaks_sixty_minute_persistence` теперь проходит без xfail.
 
 Команды в QA worktree:
 
@@ -22,7 +22,7 @@ PYTHONPATH=. uv run --offline --frozen python tests/diagnostics/evaluate_generat
 rg -n 'data/truth|truth/|true_fault|profile' packages/diagnostics packages/domain_contracts/ports.py
 ```
 
-После `13a7c38`: независимые `7 passed, 1 xfailed`; ruff passed; авторские core-тесты `8 passed`; packaged synthetic harness завершился без ошибки. Последний прогон harness: TP-177 residual +11.89 °C/slope72 +0.87 °C/сут, TP-306 unknown/null при расхождении датчиков, TP-307 unknown/null при недостатке данных, TP-308 residual +0.09 °C после восстановления. Поиск truth-ссылок в runtime-модулях пуст. Harness автора подтвержден запуском, но не подменяет независимые тесты.
+После обоих исправлений: независимые `8 passed`; ruff passed; авторские core-тесты `8 passed`; packaged synthetic harness завершился без ошибки. Последний прогон harness: TP-177 residual +11.89 °C/slope72 +0.87 °C/сут, TP-306 unknown/null при расхождении датчиков, TP-307 unknown/null при недостатке данных, TP-308 residual +0.09 °C после восстановления. Поиск truth-ссылок в runtime-модулях пуст. Harness автора подтвержден запуском, но не подменяет независимые тесты.
 
 ## Границы вывода
 
