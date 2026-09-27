@@ -75,7 +75,7 @@ export const evidenceOriginLabel: Record<S['Evidence']['origin'], string> = {
   synthetic: 'синтетический источник', presentation_illustration: 'иллюстрация презентации',
 };
 export function symptomLabel(value: string): string {
-  return ({ contact_heat: 'Локальный нагрев контакта', winding_heat: 'Нагрев обмотки', unknown: 'Причина не установлена' } as Record<string, string>)[value] || 'Требует уточнения';
+  return ({ thermal_residual: 'Отклонение от тепловой модели', contact_heat: 'Локальный нагрев контакта', winding_heat: 'Нагрев обмотки', unknown: 'Причина не установлена' } as Record<string, string>)[value] || 'Требует уточнения';
 }
 export const riskTone = (priority: Analysis['risk']['priority']) => priority;
 export const priorityLabel = { high: 'Высокий', medium: 'Средний', low: 'Низкий', unknown: 'Неизвестно' } as const;

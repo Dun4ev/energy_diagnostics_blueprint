@@ -9,6 +9,7 @@ import { CasePage } from './case';
 import { PlanPage, PlansPage } from './plan';
 import { ApiFailure, expectData, href, mutationHeaders, roleLabel, useResource } from './shared';
 import './features.css';
+import { ReplayControls } from './ReplayControls';
 
 type S = components['schemas'];
 export const featureRegistrations: S['FeatureRegistration'][] = [
@@ -66,7 +67,7 @@ function ScenarioPicker({ identity }: { identity: S['Identity'] }) {
       const virtualTime = choice === 'early'
         ? new Date(new Date(scenario.startsAt).getTime() + 7 * 86400000).toISOString()
         : choice === 'custom' ? new Date(`${customTime[scenario.datasetId] || scenario.endsAt.slice(0, 16)}:00Z`).toISOString() : scenario.endsAt;
-      if (virtualTime < scenario.startsAt || virtualTime > scenario.endsAt) throw new ApiFailure(422, 'Время должно находиться внутри периода набора.');
+      if (new Date(virtualTime) < new Date(scenario.startsAt) || new Date(virtualTime) > new Date(scenario.endsAt)) throw new ApiFailure(422, 'Время должно находиться внутри периода набора.');
       const result = expectData(await api.POST('/api/v1/demo/sessions', {
         params: { header: mutationHeaders(identity) },
         body: { datasetId: scenario.datasetId, seed: 20260925,
@@ -104,10 +105,10 @@ export function DiagnosticsApp() {
   const processing = session.data?.data.processingStatus || 'ready';
   const canShowRun = !identity.loading && identity.error?.status !== 401;
   useEffect(() => {
-    if (!run || (processing !== 'queued' && processing !== 'running')) return;
+    if (!run || (processing !== 'queued' && processing !== 'running' && session.data?.data.paused !== false)) return;
     const timer = window.setInterval(session.refresh, 3000);
     return () => window.clearInterval(timer);
-  }, [run, processing, session.refresh]);
+  }, [run, processing, session.data?.data.paused, session.refresh]);
   const connection = identity.error?.status === 0 || session.error?.status === 0 ? 'offline' : identity.loading || session.loading ? 'loading' : 'online';
   async function logout() {
     if (!identity.data) return;
@@ -118,13 +119,14 @@ export function DiagnosticsApp() {
     userLabel={identity.data?.displayName || 'Нет входа'} roleLabel={identity.data ? roleLabel[identity.data.role] : 'Просмотр'} onLogout={identity.data ? logout : undefined}
     breadcrumb={current.title} headerActions={run ? <a href="/?choose=1">Сменить набор</a> : undefined}>
     {identity.loading && !identity.data && <Loading label="Проверяем вход..." />}
-    {identity.error?.status === 401 && <Login onSuccess={identity.refresh} />}
+    {identity.error?.status === 401 && <Login onSuccess={() => window.location.reload()} />}
     {identity.error && identity.error.status !== 401 && <Banner tone="high" title="Сервер недоступен">Сохраненные данные показаны как устаревшие. Изменения недоступны.</Banner>}
     {!identity.loading && identity.error?.status !== 401 && !run && identity.data && <ScenarioPicker identity={identity.data} />}
     {canShowRun && run && session.loading && !session.data && <Loading label="Загружаем запуск..." />}
     {canShowRun && run && session.error && !session.data && <ErrorState message={session.error.message} requestId={session.error.requestId} retry={session.refresh} />}
+    {canShowRun && run && session.data && <ReplayControls session={session.data.data} identity={session.stale ? null : identity.data} refresh={session.refresh} />}
     {canShowRun && run && session.data && processing !== 'ready' && <Banner tone={processing === 'failed' ? 'high' : 'blue'} title={processing === 'failed' ? 'Подготовка набора не удалась' : 'Набор подготавливается'}>{processing === 'failed' ? session.data.data.processingError || 'Проверьте журнал сервера.' : 'Данные еще не готовы для просмотра. Статус обновляется автоматически.'}</Banner>}
     {canShowRun && run && session.data && processing !== 'ready' && <Button onClick={session.refresh}>Проверить состояние</Button>}
-    {canShowRun && run && session.data && processing === 'ready' && <>{session.stale && <Banner tone="high" title="Показаны сохраненные данные">Связь с сервером потеряна; действия заблокированы.</Banner>}{current.content(run, identity.data && !identity.stale ? identity.data : null)}</>}
+    {canShowRun && run && session.data && processing === 'ready' && <>{session.stale && <Banner tone="high" title="Показаны сохраненные данные">Связь с сервером потеряна; действия заблокированы.</Banner>}<div key={session.data.data.processedAt || session.data.data.virtualTime}>{current.content(run, identity.data && !identity.stale && !session.stale ? identity.data : null)}</div></>}
   </AppShell>;
 }

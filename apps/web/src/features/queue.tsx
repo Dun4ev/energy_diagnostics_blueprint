@@ -14,9 +14,9 @@ function sortEntries(items: RiskEntry[], sort: string) {
   if (sort === 'freshness') return copy.sort((a, b) => a.analysis.asOf.localeCompare(b.analysis.asOf));
   if (sort === 'name') return copy.sort((a, b) => a.asset.name.localeCompare(b.asset.name, 'ru'));
   return copy.sort((a, b) => {
-    if (a.analysis.risk.score === null) return -1;
-    if (b.analysis.risk.score === null) return 1;
-    return b.analysis.risk.score - a.analysis.risk.score;
+    const rank = { high: 0, medium: 1, unknown: 2, low: 3 };
+    return rank[a.analysis.risk.priority] - rank[b.analysis.risk.priority]
+      || (b.analysis.risk.score ?? -1) - (a.analysis.risk.score ?? -1);
   });
 }
 
@@ -45,8 +45,8 @@ export function QueuePage({ run }: { run: string }) {
     {resource.stale && <Banner tone="high" title="Показана сохраненная очередь">Время данных и приоритет могли измениться. Обновите после восстановления связи.</Banner>}
     {resource.data && <Card title={`${resource.data.data.total} объектов`} subtitle={`Время данных: ${date(resource.data.dataTime)} · ${resource.data.mode === 'reference' ? 'Иллюстрация презентации' : 'Расчет по синтетическим наблюдениям'}`} className="feature-queue">
       {items.length ? <><DataTable label="Очередь рисков"><thead><tr><th scope="col">Объект и сигнал</th><th scope="col">Наблюдение</th><th scope="col">Приоритет</th><th scope="col">Данные</th><th scope="col">Следующий шаг</th></tr></thead><tbody>{items.map(item => <tr key={item.asset.assetId}>
-        <td><a className="feature-row-link" href={href(item.caseId ? `/diagnostics/cases/${encodeURIComponent(item.caseId)}` : `/assets/${encodeURIComponent(item.asset.assetId)}`, run)}><strong>{item.asset.name}</strong><span aria-hidden="true">→</span></a><span className="secondary-line">{assetTypeLabel[item.asset.assetType]} · {item.asset.siteId}</span><span className="secondary-line feature-mono">{item.analysis.analysisRunId}</span></td>
-        <td>{item.asset.assetType === 'transformer' ? <><strong>{item.analysis.metrics.residualC === null ? 'Остаток не определен' : `${item.analysis.metrics.residualC > 0 ? '+' : ''}${temperature(item.analysis.metrics.residualC)}`}</strong><span className="secondary-line">Нагрузка {percent(item.analysis.metrics.loadFraction)}</span></> : <><strong>Отдельная методика</strong><span className="secondary-line">Температурный расчет не применим</span></>}</td>
+        <td><a className="feature-row-link" href={href(item.caseId ? `/diagnostics/cases/${encodeURIComponent(item.caseId)}` : `/assets/${encodeURIComponent(item.asset.assetId)}`, run)}><strong>{item.asset.name}</strong><span aria-hidden="true">→</span></a><span className="secondary-line">{assetTypeLabel[item.asset.assetType]} · {item.asset.siteId === 'demo-site' ? 'Демонстрационная площадка' : item.asset.siteId}</span><details className="secondary-line"><summary>Идентификатор расчета</summary><code className="feature-mono">{item.analysis.analysisRunId}</code></details></td>
+        <td>{item.asset.assetType === 'transformer' ? <><strong>{item.analysis.metrics.residualC === null ? 'Остаток не определен' : `${item.analysis.metrics.residualC > 0 ? '+' : ''}${temperature(item.analysis.metrics.residualC)}`}</strong><span className="secondary-line">Нагрузка: {percent(item.analysis.metrics.loadFraction)}</span></> : <><strong>Отдельная методика</strong><span className="secondary-line">Температурный расчет не применим</span></>}</td>
         <td><Badge tone={riskTone(item.analysis.risk.priority)}>{priorityLabel[item.analysis.risk.priority]}</Badge><span className="secondary-line">{item.analysis.risk.score === null ? 'Оценка неизвестна' : `${number(item.analysis.risk.score)}/10 · пилотный индекс`}</span></td>
         <td><strong>{date(item.analysis.asOf)}</strong><span className="secondary-line">{item.analysis.quality.overall === 'good' ? 'Достаточно' : item.analysis.quality.overall === 'partial' ? 'Частично' : 'Недостаточно'} · {item.analysis.quality.freshSources}/{item.analysis.quality.totalSources} источников</span></td>
         <td><strong>{item.analysis.nextActions[0] ? actionLabel[item.analysis.nextActions[0].code] : 'Требуется разбор'}</strong><span className="secondary-line">{item.nextDueAt ? `Срок: ${date(item.nextDueAt)}` : 'Срок не назначен'}</span></td>

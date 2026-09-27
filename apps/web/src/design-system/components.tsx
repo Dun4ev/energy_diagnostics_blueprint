@@ -1,10 +1,10 @@
-import { useEffect, useRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
+import { useEffect, useRef, useId, type ButtonHTMLAttributes, type ReactNode, type Ref } from 'react';
 import { Icon } from './Icon';
 export type Tone = 'high' | 'medium' | 'low' | 'unknown' | 'blue';
 export function Badge({ tone = 'unknown', children, dot = true }: { tone?: Tone; children: ReactNode; dot?: boolean }) {
   return <span className={`badge badge-${tone}`}>{dot && <span className="badge-dot" />}{children}</span>;
 }
-export function Button({ variant = 'secondary', icon, children, className = '', ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'ghost' | 'danger'; icon?: string }) {
+export function Button({ variant = 'secondary', icon, children, className = '', ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { ref?: Ref<HTMLButtonElement>; variant?: 'primary' | 'secondary' | 'ghost' | 'danger'; icon?: string }) {
   return <button {...props} className={`button button-${variant} ${className}`}>{icon && <Icon name={icon} />}{children}</button>;
 }
 export function Card({ title, subtitle, actions, children, className = '', id }: { title?: string; subtitle?: string; actions?: ReactNode; children: ReactNode; className?: string; id?: string }) {
@@ -22,8 +22,9 @@ export function ErrorState({ message, requestId, retry }: { message: string; req
 }
 export function Dialog({ open, onClose, title, children, drawer = false }: { open: boolean; onClose: () => void; title: string; children: ReactNode; drawer?: boolean }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
   useEffect(() => { if (open) ref.current?.showModal(); else ref.current?.close(); }, [open]);
-  return <dialog ref={ref} className={drawer ? 'dialog drawer' : 'dialog'} onCancel={onClose} onClose={onClose} aria-labelledby="dialog-title"><div className="dialog-heading"><h2 id="dialog-title">{title}</h2><Button variant="ghost" onClick={onClose} aria-label="Закрыть" icon="close" /></div><div className="dialog-body">{children}</div></dialog>;
+  return <dialog ref={ref} className={drawer ? 'dialog drawer' : 'dialog'} onCancel={onClose} onClose={onClose} aria-labelledby={titleId}><div className="dialog-heading"><h2 id={titleId}>{title}</h2><Button variant="ghost" onClick={onClose} aria-label="Закрыть" icon="close" /></div><div className="dialog-body">{children}</div></dialog>;
 }
 export function PageHeading({ eyebrow, title, subtitle, actions }: { eyebrow?: string; title: string; subtitle?: ReactNode; actions?: ReactNode }) {
   return <div className="page-heading"><div>{eyebrow && <p className="eyebrow">{eyebrow}</p>}<h1>{title}</h1>{subtitle && <div className="muted page-subtitle">{subtitle}</div>}</div>{actions && <div className="page-actions">{actions}</div>}</div>;
