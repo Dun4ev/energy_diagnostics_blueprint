@@ -1,7 +1,6 @@
 """Independent black-box checks against the frozen numerical acceptance criteria.
 
-Known defects remain strict xfails so fixes turn them into XPASS failures until
-reviewed. No truth/ fixture or production code is imported by these tests.
+No truth/ fixture or production implementation module is imported by these tests.
 """
 
 from __future__ import annotations
@@ -159,7 +158,6 @@ def test_exact_linear_residual_trend_and_recovery_without_auto_close():
     assert recovered.analysis.risk.score is not None
 
 
-@pytest.mark.xfail(strict=True, reason="core identity omits clock and policy")
 def test_analysis_identity_changes_when_freshness_changes_without_new_observations():
     observations = samples()
     fresh, _ = evaluate(observations)
@@ -170,14 +168,12 @@ def test_analysis_identity_changes_when_freshness_changes_without_new_observatio
     assert fresh.analysis.analysisRunId != stale.analysis.analysisRunId
 
 
-@pytest.mark.xfail(strict=True, reason="single threshold crossing incorrectly latches hysteresis")
 def test_one_high_sample_does_not_latch_review_before_persistence():
     transient, _ = evaluate(samples(high_at={80}))
     assert transient.details.persistenceMinutes == 0.0
     assert transient.analysis.status == "normal"
 
 
-@pytest.mark.xfail(strict=True, reason="empty input has unknown-run and colliding analysis ID")
 def test_empty_assets_do_not_share_analysis_identity():
     other_asset = ASSET.model_copy(update={"assetId": "another-transformer"})
     first, _ = evaluate([], scenario_run_id="qa-empty")
@@ -185,3 +181,48 @@ def test_empty_assets_do_not_share_analysis_identity():
     assert first.analysis.risk.priority == second.analysis.risk.priority == "unknown"
     assert first.analysis.scenarioRunId == second.analysis.scenarioRunId == "qa-empty"
     assert first.analysis.analysisRunId != second.analysis.analysisRunId
+
+
+def test_analysis_identity_tracks_policy_calibration_and_run_context():
+    observations = samples()
+    base, _ = evaluate(observations, scenario_run_id="qa-run")
+    changed_policy = POLICY.model_copy(update={"version": "independent-policy-revision"})
+    policy_result, _ = evaluate(observations, policy=changed_policy, scenario_run_id="qa-run")
+    changed_asset = ASSET.model_copy(update={
+        "calibration": ASSET.calibration.model_copy(update={"bC": 61.0})
+    })
+    asset_result, _ = evaluate(observations, asset=changed_asset, scenario_run_id="qa-run")
+    assert base.details.inputSnapshotHash == policy_result.details.inputSnapshotHash
+    assert base.details.inputSnapshotHash == asset_result.details.inputSnapshotHash
+    assert len({base.analysis.analysisRunId, policy_result.analysis.analysisRunId,
+                asset_result.analysis.analysisRunId}) == 3
+    with pytest.raises(ValueError, match="scenario_run_id"):
+        evaluate(observations, scenario_run_id="wrong-run")
+
+
+@pytest.mark.xfail(strict=True, reason="watch persistence bridges a disputed residual point")
+def test_disputed_midpoint_breaks_sixty_minute_persistence():
+    observations = samples()
+    for minute in range(5, 70, 5):
+        when = START + timedelta(hours=80, minutes=minute)
+        for channel, metric, unit, value in (
+            ("load", "load_fraction", "fraction", 0.6),
+            ("ambient", "ambient_temperature", "degC", 20.0),
+            ("primary_a", "contact_temperature", "degC", BASELINE + 10.0),
+            # At one midpoint the independent channel disputes the primary.
+            ("independent_a", "contact_temperature", "degC",
+             BASELINE if minute == 35 else BASELINE + 10.0),
+            ("phase_b", "contact_temperature", "degC", BASELINE - 1.0),
+        ):
+            observations.append(Measurement(
+                schemaVersion="0.1.0", measurementId=f"disputed-{minute}-{channel}",
+                assetId=ASSET.assetId, sourceId=f"{ASSET.assetId}:{channel}",
+                metric=metric, eventTime=when, receivedAt=when + timedelta(seconds=1),
+                value=float(value), unit=unit, quality="good", origin="synthetic",
+                scenarioRunId="qa-run",
+            ))
+    reviewed, points = evaluate(observations, at=START + timedelta(hours=81, minutes=5, seconds=2))
+    midpoint = next(p for p in points if p.eventTime == START + timedelta(hours=80, minutes=35))
+    assert midpoint.quality == "suspect" and midpoint.residualC is None
+    assert reviewed.details.persistenceMinutes < POLICY.detection.persistMinutes
+    assert reviewed.analysis.status == "normal"
