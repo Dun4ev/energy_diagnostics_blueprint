@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState, useRef } from 'react';
 import { api } from '../api/client';
 import type { components } from '../api/generated';
 import { Badge, Banner, Button, Card, Dialog, Empty, ErrorState, Loading, PageHeading } from '../design-system/components';
@@ -75,6 +75,8 @@ function CaseDecision({ snapshot, identity, run, refresh }: { snapshot: Snapshot
 }
 
 function CreatePlan({ snapshot, identity, run }: { snapshot: Snapshot; identity: Identity | null; run: string }) {
+  const stepIds = useRef(new Map<string, string>());
+  const intent = useRef<{ payload: string; key: string } | null>(null);
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState('');
   const [pending, setPending] = useState(false);
@@ -84,18 +86,19 @@ function CreatePlan({ snapshot, identity, run }: { snapshot: Snapshot; identity:
     event.preventDefault(); if (!identity) return;
     setPending(true); setFailure(null);
     const steps: S['PlanStep'][] = snapshot.analysis.nextActions.map((action, index) => ({
-      stepId: crypto.randomUUID(), number: index + 1, actionCode: action.code,
+      stepId: stepIds.current.get(action.code) || (() => { const id = crypto.randomUUID(); stepIds.current.set(action.code, id); return id; })(), number: index + 1, actionCode: action.code,
       description: action.reason, assigneeRole: 'technician', assigneeId: null,
       dueAt: null, dueWithinHours: action.dueWithinHours,
       dueAnchor: action.dueWithinHours === null ? 'reference_unspecified' : 'approved_at',
       requiredEvidence: [], condition: action.code === 'PLAN_MAINTENANCE_IF_CONFIRMED' ? 'defect_confirmed' : 'approved_plan',
       status: 'not_started', result: null, resultEvidenceIds: [],
     }));
+    const body = { caseId: snapshot.case.caseId, analysisRunId: snapshot.analysis.analysisRunId,
+      evidenceRevision: snapshot.case.evidenceRevision, expectedCaseRevision: snapshot.case.revision, reason, steps };
+    const payload = JSON.stringify(body);
+    if (intent.current?.payload !== payload) intent.current = { payload, key: crypto.randomUUID() };
     try {
-      const result = expectData(await api.POST('/api/v1/work-plans', { params: { query: { scenarioRunId: run }, header: mutationHeaders(identity) }, body: {
-        caseId: snapshot.case.caseId, analysisRunId: snapshot.analysis.analysisRunId,
-        evidenceRevision: snapshot.case.evidenceRevision, expectedCaseRevision: snapshot.case.revision, reason, steps,
-      } }));
+      const result = expectData(await api.POST('/api/v1/work-plans', { params: { query: { scenarioRunId: run }, header: { ...mutationHeaders(identity), 'Idempotency-Key': intent.current.key } }, body }));
       window.location.assign(href(`/work-plans/${encodeURIComponent(result.data.planId)}`, run));
     } catch (error) { setFailure(error instanceof ApiFailure ? error : new ApiFailure(0, 'Нет связи с сервером.')); }
     finally { setPending(false); }
