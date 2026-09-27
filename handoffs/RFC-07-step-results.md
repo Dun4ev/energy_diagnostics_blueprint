@@ -1,0 +1,7 @@
+# RFC07: хранение результата шага и серверные условия
+
+Независимый workflow review выявил потерю conclusion/observedAt, отсутствие серверной проверки defect_confirmed. Совместимое добавление PlanStep.result (default null): StepResultRecord actorId, observedAt, recordedAt, conclusion, evidenceIds. Это запись результата, а не автоматическое подтверждение. Старые fixtures остаются допустимыми. Создание/редактирование draft не может подставить выполненные статусы или результаты. observedAt ограничен виртуальным временем. Условие defect_confirmed требует сохраненного Defect данного case/run. Устаревший approved plan нельзя начать; изменившийся анализ требует нового проекта.
+
+Сохраненная база согласования evidenceRevision не переписывается результатами. Новые evidence во время выполнения могут использоваться в result; исходное согласование остается историческим. Завершение по-прежнему только approver после наличия результатов всех шагов. UI не должен считать ожидаемое добавление result evidence автоматической invalidation уже выполняемого проекта; server staleReview и analysisId обязательны.
+
+Чтения и записи run сериализуются через p.get_run FOR UPDATE для coherent snapshots при PostgreSQL READ COMMITTED. Это ограниченный локальный prototype tradeoff, не утверждение промышленной производительности; глобальный уровень изоляции не меняется, idempotency видит committed result после блокировки.

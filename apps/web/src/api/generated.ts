@@ -2170,6 +2170,8 @@ export interface components {
             number: number;
             /** Requiredevidence */
             requiredEvidence: string[];
+            /** @default null */
+            result: components["schemas"]["StepResultRecord"] | null;
             /** Resultevidenceids */
             resultEvidenceIds: string[];
             /**
@@ -2460,6 +2462,25 @@ export interface components {
             reason: string;
             /** Stepid */
             stepId: string;
+        };
+        /** StepResultRecord */
+        StepResultRecord: {
+            /** Actorid */
+            actorId: string;
+            /** Conclusion */
+            conclusion: string;
+            /** Evidenceids */
+            evidenceIds: string[];
+            /**
+             * Observedat
+             * Format: date-time
+             */
+            observedAt: string;
+            /**
+             * Recordedat
+             * Format: date-time
+             */
+            recordedAt: string;
         };
         /** ThermalCalibration */
         ThermalCalibration: {

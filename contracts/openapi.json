@@ -4719,6 +4719,17 @@
             "title": "Requiredevidence",
             "type": "array"
           },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StepResultRecord"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
           "resultEvidenceIds": {
             "items": {
               "maxLength": 128,
@@ -5560,6 +5571,51 @@
           "conclusion"
         ],
         "title": "StepResult",
+        "type": "object"
+      },
+      "StepResultRecord": {
+        "additionalProperties": false,
+        "properties": {
+          "actorId": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Actorid",
+            "type": "string"
+          },
+          "conclusion": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Conclusion",
+            "type": "string"
+          },
+          "evidenceIds": {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Evidenceids",
+            "type": "array"
+          },
+          "observedAt": {
+            "format": "date-time",
+            "title": "Observedat",
+            "type": "string"
+          },
+          "recordedAt": {
+            "format": "date-time",
+            "title": "Recordedat",
+            "type": "string"
+          }
+        },
+        "required": [
+          "actorId",
+          "observedAt",
+          "recordedAt",
+          "conclusion",
+          "evidenceIds"
+        ],
+        "title": "StepResultRecord",
         "type": "object"
       },
       "ThermalCalibration": {

@@ -39,7 +39,7 @@ def require(condition: bool, code: str, message: str, status: int = 422):
 
 
 def get_run(session: Session, run_id: str) -> db.RunRow:
-    run = session.get(db.RunRow, run_id)
+    run = session.scalar(select(db.RunRow).where(db.RunRow.id == run_id).with_for_update())
     require(run is not None, "NOT_FOUND", "Сеанс не найден", 404)
     return run
 
@@ -322,6 +322,8 @@ def create_plan(session: Session, case: db.CaseRow, body: m.PlanDraft,
     check_revision(case.evidence_revision, body.evidenceRevision)
     require(case.analysis_id == body.analysisRunId, "ANALYSIS_CONFLICT",
             "Анализ изменился, обновите случай", 409)
+    require(all(step.status == "not_started" and not step.resultEvidenceIds and step.result is None
+                for step in body.steps), "INVALID_RESULT", "Результаты нельзя задавать в проекте")
     plan = m.WorkPlan(planId=str(uuid4()), scenarioRunId=case.run_id,
                       caseId=case.id, analysisRunId=body.analysisRunId,
                       evidenceRevision=body.evidenceRevision, revision=1,
@@ -341,6 +343,8 @@ def update_plan(session: Session, row: db.PlanRow, body: m.PlanEdit,
             "Редактировать можно только проект")
     case = get_case(session, row.run_id, row.case_id, lock=True)
     check_evidence_ids(session, case, body.evidenceIds)
+    require(all(step.status == "not_started" and not step.resultEvidenceIds and step.result is None
+                for step in body.steps), "INVALID_RESULT", "Результаты нельзя задавать при редактировании проекта")
     plan = m.WorkPlan.model_validate({**row.body, "steps": [wire(s) for s in body.steps],
                                       "revision": row.revision + 1})
     previous = row.revision
@@ -362,7 +366,7 @@ def transition_plan(session: Session, row: db.PlanRow, body: m.PlanSubmit | m.Pl
             "ANALYSIS_CONFLICT", "Анализ проекта не совпадает", 409)
     require(row.body["evidenceRevision"] == body.evidenceRevision,
             "EVIDENCE_CONFLICT", "Ревизия доказательств не совпадает", 409)
-    if target in {m.PlanState.SUBMITTED, m.PlanState.APPROVED}:
+    if target in {m.PlanState.SUBMITTED, m.PlanState.APPROVED, m.PlanState.IN_PROGRESS}:
         require(case.analysis_id == body.analysisRunId
                 and case.evidence_revision == body.evidenceRevision
                 and not row.body["staleReview"], "STALE_REVIEW",
@@ -409,6 +413,19 @@ def record_step(session: Session, row: db.PlanRow, body: m.StepResult,
             "FORBIDDEN", "Шаг назначен другому исполнителю", 403)
     require(match["status"] in {"not_started", "in_progress"},
             "INVALID_TRANSITION", "Результат шага уже записан")
+    require(not row.body["staleReview"] and case.analysis_id == row.body["analysisRunId"],
+            "STALE_REVIEW", "Анализ изменился; нужен новый проект проверки", 409)
+    run = get_run(session, row.run_id)
+    require(body.observedAt <= as_utc(run.virtual_time), "TIME_MISMATCH",
+            "Результат позже времени данных")
+    if match["condition"] == "defect_confirmed":
+        confirmed = session.scalar(select(db.DefectRow).where(
+            db.DefectRow.run_id == row.run_id, db.DefectRow.case_id == case.id))
+        require(confirmed is not None, "DEFECT_CONFIRMATION_REQUIRED",
+                "Этот шаг допустим только после подтверждения дефекта инженером")
+    match["result"] = wire(m.StepResultRecord(actorId=actor_id, observedAt=body.observedAt,
+                                             recordedAt=utc_now(), conclusion=body.conclusion,
+                                             evidenceIds=body.evidenceIds))
     match["status"] = "result_recorded"
     match["resultEvidenceIds"] = body.evidenceIds
     updated = m.WorkPlan.model_validate({**row.body, "steps": steps,

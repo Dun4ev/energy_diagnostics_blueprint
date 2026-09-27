@@ -365,6 +365,14 @@ class Case(DTO):
     outcome: Text | None
 
 
+class StepResultRecord(DTO):
+    actorId: ID
+    observedAt: Time
+    recordedAt: Time
+    conclusion: Text
+    evidenceIds: list[ID]
+
+
 class PlanStep(DTO):
     stepId: ID
     number: Annotated[Integer, Field(ge=1)]
@@ -379,6 +387,7 @@ class PlanStep(DTO):
     condition: Literal["approved_plan", "defect_confirmed"]
     status: Literal["not_started", "in_progress", "result_recorded", "verified"]
     resultEvidenceIds: list[ID]
+    result: StepResultRecord | None = None
 
 
 class WorkPlan(DTO):
