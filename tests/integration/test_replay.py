@@ -66,6 +66,9 @@ def test_reference_isolated_chart_and_replay_commands(tmp_path, monkeypatch):
         analysis = session.scalar(select(db.AnalysisRow))
         assert analysis.bundle["analysis"]["risk"]["score"] == 7.2
         assert len(analysis.series) == 15
+        snapshot = session.scalar(select(db.SnapshotRow))
+        assert len(snapshot.body["topology"]["nodes"]) == 4
+        assert snapshot.body["topology"]["nodes"][-1]["state"] == "unknown"
     with factory.begin() as session:
         run = new_run(session, m.SessionCreate(datasetId="synthetic-energy-30d", seed=SEED,
                       mode="simulation", virtualTime=START+timedelta(days=7), reason="normal"), "engineer", "run")

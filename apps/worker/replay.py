@@ -108,6 +108,16 @@ def _publish_reference(session, row):
                             ambientC=None, quality="good", sourceIds=["presentation-slide29"],
                             historicalLowerC=x["illustrativeBandLowC"], historicalUpperC=x["illustrativeBandHighC"])
               for x in chart]
+    topology_raw = json.loads((chart_path.parent / "reference-topology.json").read_text())
+    states = {node["id"]: node["state"] for node in topology_raw["nodes"]}
+    topology = m.Topology(
+        nodes=[m.TopologyNode(nodeId=node["id"], assetId=node["id"] if node["id"] == value.asset.assetId else None,
+                              label=node["label"], state=node["state"], origin="model", observedAt=REFERENCE_TIME)
+               for node in topology_raw["nodes"]],
+        edges=[m.TopologyEdge(source=edge["from"], target=edge["to"], state=states[edge["to"]])
+               for edge in topology_raw["edges"]],
+        label="Иллюстрация схемы из презентации. Состояние модели, не подтверждено телеметрией. Т-2: неизвестно.")
+    value = value.model_copy(update={"topology": topology})
     asset, case, analysis = value.asset, value.case, value.analysis
     session.add(db.AssetRow(run_id=row.id, id=asset.assetId, site_id=asset.siteId,
                             asset_type=asset.assetType, body=p.wire(asset)))
