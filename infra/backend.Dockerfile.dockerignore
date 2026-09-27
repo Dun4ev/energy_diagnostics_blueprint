@@ -8,3 +8,10 @@
 !apps/api/**
 !apps/worker/
 !apps/worker/**
+
+**/__pycache__
+**/*.pyc
+**/node_modules
+**/dist
+**/.env
+**/.env.*

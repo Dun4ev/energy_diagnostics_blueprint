@@ -36,3 +36,7 @@ npm/package-lock.json, uv/uv.lock принадлежат интегратору.
 DESIGN.md сохраняется с исходным именем/содержимым; тест blueprint должен ссылаться на действительный регистр. Ссылки в исходных prompts читаются как DESIGN.md; документы источника не переписываются массово. .gitignore добавлен до installs. Отсутствующие project skills не устанавливаются.
 
 Риски: синтетика не дает field validation; persistence/auth/workflow пока не реализованы. Новые DTO требуют обновления generated TS и drift tests, любые последующие изменения через RFC.
+
+## Исправления независимого ревью до G1
+
+Числа/целые и булевы значения wire DTO строгие: строки и bool не превращаются в числа. Timestamp принимает ISO8601/aware datetime, не Unix number. Measurement eventTime не позже receivedAt; нарушения отправляются ingestion в quarantine. Envelope проверяет nested mode/run, asOf<=dataTime; для текущего CaseSnapshot dataTime=analysis.asOf, для ScenarioSession=virtualTime. Evidence measurement проверяет asset/run/origin; RiskEntry сверяет asset с AnalysisResult. Reference MSW ограничен известным id/run; чужой id/run возвращает404. Исправления проверены независимыми negative tests и общим JSON corpus Python/JS.

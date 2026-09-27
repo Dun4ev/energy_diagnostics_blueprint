@@ -61,7 +61,7 @@ mocks.ts не импортируется production entry. Он предназн
 Проектный @playwright/test закреплен. Если Chromium еще не доступен, его установка является проектным QA prerequisite:
 
 ```bash
-npx --no-install playwright install chromium
+PLAYWRIGHT_SKIP_BROWSER_GC=1 npx --no-install playwright install chromium
 npm run test:e2e
 ```
 

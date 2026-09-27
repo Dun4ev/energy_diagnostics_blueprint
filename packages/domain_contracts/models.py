@@ -6,9 +6,43 @@ from datetime import datetime, timezone
 from enum import StrEnum
 from typing import Annotated, Generic, Literal, TypeVar
 
-from pydantic import AfterValidator, BaseModel, ConfigDict, Field, model_validator
+from pydantic import (
+    AfterValidator,
+    BaseModel,
+    BeforeValidator,
+    ConfigDict,
+    Field,
+    StrictBool,
+    model_validator,
+)
 
 from .schema_rules import ANALYSIS_RULES, MEASUREMENT_RULES
+
+Number = Annotated[float, Field(strict=True)]
+Integer = Annotated[int, Field(strict=True)]
+
+
+def require_bool(value):
+    if type(value) is not bool:
+        raise ValueError("boolean required")
+    return value
+
+
+def require_int(value):
+    if type(value) is not int:
+        raise ValueError("integer required")
+    return value
+
+
+def require_time(value):
+    if not isinstance(value, (str, datetime)):
+        raise ValueError("ISO8601 timestamp required")
+    return value
+
+
+TrueFlag = Annotated[Literal[True], BeforeValidator(require_bool)]
+FalseFlag = Annotated[Literal[False], BeforeValidator(require_bool)]
+Speed = Annotated[Literal[1, 10, 60], BeforeValidator(require_int)]
 
 
 def utc(value: datetime) -> datetime:
@@ -17,11 +51,11 @@ def utc(value: datetime) -> datetime:
     return value.astimezone(timezone.utc)
 
 
-Time = Annotated[datetime, AfterValidator(utc)]
+Time = Annotated[datetime, BeforeValidator(require_time), AfterValidator(utc)]
 Text = Annotated[str, Field(min_length=1, max_length=4000)]
 ID = Annotated[str, Field(min_length=1, max_length=128)]
-Fraction = Annotated[float, Field(ge=0, le=1)]
-Revision = Annotated[int, Field(ge=1)]
+Fraction = Annotated[Number, Field(ge=0, le=1)]
+Revision = Annotated[Integer, Field(ge=1)]
 Mode = Literal["reference", "simulation"]
 Metric = Literal[
     "contact_temperature",
@@ -57,7 +91,7 @@ class Measurement(DTO):
     metric: Metric
     eventTime: Time
     receivedAt: Time
-    value: float | None
+    value: Number | None
     unit: Unit
     quality: Quality
     origin: Literal["synthetic", "field"]
@@ -72,6 +106,8 @@ class Measurement(DTO):
             "closing_time": "ms",
             "relative_pd_indicator": "dB_ref_demo",
         }
+        if self.eventTime > self.receivedAt:
+            raise ValueError("eventTime cannot follow receivedAt")
         if self.unit != units[self.metric]:
             raise ValueError("metric/unit mismatch")
         if self.quality == "missing" and self.value is not None:
@@ -85,8 +121,8 @@ class Measurement(DTO):
 
 class AnalysisQuality(DTO):
     overall: Literal["good", "partial", "insufficient", "invalid"]
-    freshSources: Annotated[int, Field(ge=0)]
-    totalSources: Annotated[int, Field(ge=0)]
+    freshSources: Annotated[Integer, Field(ge=0)]
+    totalSources: Annotated[Integer, Field(ge=0)]
     coverage: Fraction | None
     issues: list[Text]
 
@@ -98,13 +134,13 @@ class AnalysisQuality(DTO):
 
 
 class AnalysisMetrics(DTO):
-    observedTemperatureC: float | None
-    expectedTemperatureC: float | None
-    residualC: float | None
-    loadFraction: float | None
-    ambientC: float | None
-    slopeCPerDay: float | None
-    trendWindowHours: int | None
+    observedTemperatureC: Number | None
+    expectedTemperatureC: Number | None
+    residualC: Number | None
+    loadFraction: Number | None
+    ambientC: Number | None
+    slopeCPerDay: Number | None
+    trendWindowHours: Integer | None
     failureProbability: None
 
     @model_validator(mode="after")
@@ -119,11 +155,11 @@ class AnalysisMetrics(DTO):
 
 
 class Risk(DTO):
-    score: Annotated[float, Field(ge=0, le=10)] | None
-    scaleMax: Literal[10]
+    score: Annotated[Number, Field(ge=0, le=10)] | None
+    scaleMax: Annotated[Literal[10], BeforeValidator(require_int)]
     priority: Priority
     label: Text
-    probabilistic: Literal[False]
+    probabilistic: FalseFlag
 
     @model_validator(mode="after")
     def unknown(self):
@@ -143,14 +179,14 @@ class Hypothesis(DTO):
 class NextAction(DTO):
     code: ActionCode
     reason: Text
-    dueWithinHours: Annotated[float, Field(gt=0)] | None
-    requiresHumanApproval: Literal[True]
+    dueWithinHours: Annotated[Number, Field(gt=0)] | None
+    requiresHumanApproval: TrueFlag
 
 
 class MonitoringWindow(DTO):
-    minDays: Annotated[float, Field(ge=0)] | None
-    maxDays: Annotated[float, Field(ge=0)] | None
-    isFailureDateForecast: Literal[False]
+    minDays: Annotated[Number, Field(ge=0)] | None
+    maxDays: Annotated[Number, Field(ge=0)] | None
+    isFailureDateForecast: FalseFlag
 
     @model_validator(mode="after")
     def bounds(self):
@@ -180,8 +216,8 @@ class AnalysisResult(DTO):
     hypotheses: list[Hypothesis]
     nextActions: list[NextAction]
     monitoringWindow: MonitoringWindow
-    advisoryOnly: Literal[True]
-    controlCommandsAllowed: Literal[False]
+    advisoryOnly: TrueFlag
+    controlCommandsAllowed: FalseFlag
 
     @model_validator(mode="after")
     def semantics(self):
@@ -200,9 +236,9 @@ class AnalysisResult(DTO):
 
 
 class ThermalCalibration(DTO):
-    aC: float
-    bC: Annotated[float, Field(ge=0)]
-    tauHours: Annotated[float, Field(gt=0)]
+    aC: Number
+    bC: Annotated[Number, Field(ge=0)]
+    tauHours: Annotated[Number, Field(gt=0)]
 
 
 class Asset(DTO):
@@ -223,8 +259,8 @@ class Source(DTO):
     unit: Unit
     location: Text
     channel: Literal["primary_a", "independent_a", "phase_b", "load", "ambient", "event", "daily"]
-    frequencySeconds: Annotated[int, Field(gt=0)] | None
-    maxAgeSeconds: Annotated[int, Field(gt=0)]
+    frequencySeconds: Annotated[Integer, Field(gt=0)] | None
+    maxAgeSeconds: Annotated[Integer, Field(gt=0)]
     origin: Literal["synthetic", "field"]
 
 
@@ -243,7 +279,23 @@ class Evidence(DTO):
     measurement: Measurement | None
     uri: str | None
     sha256: Annotated[str, Field(pattern="^[a-f0-9]{64}$")] | None
-    hasImage: bool
+    hasImage: StrictBool
+
+    @model_validator(mode="after")
+    def provenance(self):
+        if self.kind == "measurement" and self.measurement is None:
+            raise ValueError("measurement evidence requires a measurement")
+        if self.measurement is not None:
+            if (
+                self.measurement.assetId != self.assetId
+                or self.measurement.scenarioRunId != self.scenarioRunId
+            ):
+                raise ValueError("evidence measurement asset/run mismatch")
+            if self.measurement.origin != self.origin:
+                raise ValueError("evidence measurement origin mismatch")
+        if self.hasImage and (self.uri is None or self.sha256 is None):
+            raise ValueError("image requires URI and hash")
+        return self
 
 
 class CaseState(StrEnum):
@@ -315,13 +367,13 @@ class Case(DTO):
 
 class PlanStep(DTO):
     stepId: ID
-    number: Annotated[int, Field(ge=1)]
+    number: Annotated[Integer, Field(ge=1)]
     actionCode: ActionCode
     description: Text
     assigneeRole: Role
     assigneeId: ID | None
     dueAt: Time | None
-    dueWithinHours: Annotated[float, Field(gt=0)] | None
+    dueWithinHours: Annotated[Number, Field(gt=0)] | None
     dueAnchor: Literal["case_opened", "approved_at", "reference_unspecified"]
     requiredEvidence: list[Text]
     condition: Literal["approved_plan", "defect_confirmed"]
@@ -338,7 +390,7 @@ class WorkPlan(DTO):
     revision: Revision
     authorId: ID
     state: PlanState
-    staleReview: bool
+    staleReview: StrictBool
     steps: list[PlanStep]
 
     @model_validator(mode="after")
@@ -369,7 +421,7 @@ class AuditEvent(DTO):
     actorId: ID
     action: Text
     objectId: ID
-    previousRevision: Annotated[int, Field(ge=0)]
+    previousRevision: Annotated[Integer, Field(ge=0)]
     newRevision: Revision
     timestamp: Time
     requestId: ID
@@ -400,23 +452,23 @@ class InputWindow(DTO):
 
 class Trend(DTO):
     windowHours: Literal[24, 72]
-    slopeCPerDay: float | None
-    hourlyBins: Annotated[int, Field(ge=0)]
+    slopeCPerDay: Number | None
+    hourlyBins: Annotated[Integer, Field(ge=0)]
     coverage: Fraction
     reason: Text | None
 
 
 class SeriesPoint(DTO):
     eventTime: Time
-    observedC: float | None
-    expectedC: float | None
-    residualC: float | None
-    loadFraction: float | None
-    ambientC: float | None
+    observedC: Number | None
+    expectedC: Number | None
+    residualC: Number | None
+    loadFraction: Number | None
+    ambientC: Number | None
     quality: Quality
     sourceIds: list[ID]
-    historicalLowerC: float | None
-    historicalUpperC: float | None
+    historicalLowerC: Number | None
+    historicalUpperC: Number | None
 
 
 class AnalysisDetails(DTO):
@@ -424,11 +476,11 @@ class AnalysisDetails(DTO):
     inputWindow: InputWindow
     inputSnapshotHash: Annotated[str, Field(pattern="^[a-f0-9]{64}$")] | None
     trends: list[Trend]
-    persistenceMinutes: Annotated[float, Field(ge=0)] | None
+    persistenceMinutes: Annotated[Number, Field(ge=0)] | None
     counterEvidenceIds: list[ID]
     methodStatus: Literal["supported", "unsupported", "warm_up", "reference"]
     methodReason: Text | None
-    forecastEnabled: Literal[False]
+    forecastEnabled: FalseFlag
 
 
 class AnalysisBundle(DTO):
@@ -506,6 +558,12 @@ class RiskEntry(DTO):
     assignedTo: ID | None
     nextDueAt: Time | None
 
+    @model_validator(mode="after")
+    def coherent_asset(self):
+        if self.asset.assetId != self.analysis.assetId:
+            raise ValueError("risk entry asset mismatch")
+        return self
+
 
 class Scenario(DTO):
     datasetId: ID
@@ -518,12 +576,12 @@ class Scenario(DTO):
 class ScenarioSession(DTO):
     scenarioRunId: ID
     datasetId: ID
-    seed: int
+    seed: Integer
     mode: Mode
     virtualTime: Time
     replayReceivedAt: Time
-    speed: Literal[1, 10, 60]
-    paused: bool
+    speed: Speed
+    paused: StrictBool
     revision: Revision
 
 
@@ -531,14 +589,14 @@ class ModelInfo(DTO):
     modelVersion: ID
     policyVersion: ID
     supportedAssetTypes: list[Literal["transformer"]]
-    advisoryOnly: Literal[True]
-    forecastEnabled: Literal[False]
+    advisoryOnly: TrueFlag
+    forecastEnabled: FalseFlag
 
 
 class APIError(DTO):
     code: Text
     message: Text
-    details: dict[str, str | int | list[str]]
+    details: dict[str, str | Integer | list[str]]
     requestId: ID
 
 
@@ -553,12 +611,35 @@ class Envelope(DTO, Generic[T]):
     requestId: ID
     data: T
 
+    @model_validator(mode="after")
+    def coherent_context(self):
+        def visit(value):
+            if isinstance(value, DTO):
+                if hasattr(value, "scenarioRunId") and value.scenarioRunId != self.scenarioRunId:
+                    raise ValueError("envelope run mismatch")
+                if hasattr(value, "mode") and value.mode != self.mode:
+                    raise ValueError("envelope mode mismatch")
+                if hasattr(value, "asOf") and value.asOf > self.dataTime:
+                    raise ValueError("analysis beyond envelope dataTime")
+                for name in type(value).model_fields:
+                    visit(getattr(value, name))
+            elif isinstance(value, (list, tuple)):
+                for item in value:
+                    visit(item)
+
+        visit(self.data)
+        if isinstance(self.data, CaseSnapshot) and self.data.analysis.asOf != self.dataTime:
+            raise ValueError("snapshot dataTime must equal analysis asOf")
+        if isinstance(self.data, ScenarioSession) and self.data.virtualTime != self.dataTime:
+            raise ValueError("session dataTime must equal virtualTime")
+        return self
+
 
 class Page(DTO, Generic[T]):
     items: list[T]
-    total: Annotated[int, Field(ge=0)]
-    offset: Annotated[int, Field(ge=0)]
-    limit: Annotated[int, Field(ge=1, le=1000)]
+    total: Annotated[Integer, Field(ge=0)]
+    offset: Annotated[Integer, Field(ge=0)]
+    limit: Annotated[Integer, Field(ge=1, le=1000)]
 
 
 class LoginRequest(DTO):
@@ -628,7 +709,7 @@ class EvidenceCreate(DTO):
 
 class SessionCreate(DTO):
     datasetId: ID
-    seed: int
+    seed: Integer
     mode: Mode
     virtualTime: Time
     reason: Text
@@ -637,8 +718,8 @@ class SessionCreate(DTO):
 class SessionAdvance(DTO):
     expectedRevision: Revision
     action: Literal["pause", "resume", "step", "speed"]
-    seconds: Annotated[int, Field(ge=0, le=86400)]
-    speed: Literal[1, 10, 60]
+    seconds: Annotated[Integer, Field(ge=0, le=86400)]
+    speed: Speed
     reason: Text
 
 
@@ -647,9 +728,9 @@ class Health(DTO):
     stage: Literal["foundation"]
     database: Literal["ready", "unavailable", "unconfigured"]
     businessRuntime: Literal["not_implemented"]
-    advisoryOnly: Literal[True]
-    controlCommandsAllowed: Literal[False]
-    externalAiEnabled: Literal[False]
+    advisoryOnly: TrueFlag
+    controlCommandsAllowed: FalseFlag
+    externalAiEnabled: FalseFlag
 
 
 class BrandConfig(DTO):
@@ -670,21 +751,21 @@ class FeatureRegistration(DTO):
     route: Text
     label: Text
     permission: Permission
-    implemented: bool
+    implemented: StrictBool
 
 
 class ThermalPolicy(DTO):
-    aC: float
-    bC: float
-    tauHours: Annotated[float, Field(gt=0)]
+    aC: Number
+    bC: Number
+    tauHours: Annotated[Number, Field(gt=0)]
 
 
 class QualityPolicy(DTO):
-    maxTelemetryAgeSeconds: Annotated[int, Field(gt=0)]
+    maxTelemetryAgeSeconds: Annotated[Integer, Field(gt=0)]
     minimumWindowCoverage: Fraction
-    minimumTrendHours: Annotated[int, Field(gt=0)]
-    minimumHourlyBins: Annotated[int, Field(gt=1)]
-    thermographyMaxAgeHoursForThisHeatCaseOnly: Annotated[int, Field(gt=0)]
+    minimumTrendHours: Annotated[Integer, Field(gt=0)]
+    minimumHourlyBins: Annotated[Integer, Field(gt=1)]
+    thermographyMaxAgeHoursForThisHeatCaseOnly: Annotated[Integer, Field(gt=0)]
 
 
 class TrendPolicy(DTO):
@@ -694,11 +775,11 @@ class TrendPolicy(DTO):
 
 
 class DetectionPolicy(DTO):
-    residualWatchC: float
-    persistMinutes: Annotated[int, Field(gt=0)]
-    clearResidualC: float
-    clearPersistMinutes: Annotated[int, Field(gt=0)]
-    autoCloseCase: Literal[False]
+    residualWatchC: Number
+    persistMinutes: Annotated[Integer, Field(gt=0)]
+    clearResidualC: Number
+    clearPersistMinutes: Annotated[Integer, Field(gt=0)]
+    autoCloseCase: FalseFlag
 
 
 class PriorityWeights(DTO):
@@ -714,19 +795,19 @@ class PriorityWeights(DTO):
 
 
 class PriorityPolicy(DTO):
-    severityScaleC: Annotated[float, Field(gt=0)]
-    growthScaleCPerDay: Annotated[float, Field(gt=0)]
+    severityScaleC: Annotated[Number, Field(gt=0)]
+    growthScaleCPerDay: Annotated[Number, Field(gt=0)]
     weights: PriorityWeights
-    mediumFrom: Annotated[float, Field(ge=0, le=10)]
-    highFrom: Annotated[float, Field(ge=0, le=10)]
+    mediumFrom: Annotated[Number, Field(ge=0, le=10)]
+    highFrom: Annotated[Number, Field(ge=0, le=10)]
     insufficientDataScore: None
-    qualityMustNotReduceRiskToZero: Literal[True]
+    qualityMustNotReduceRiskToZero: TrueFlag
 
 
 class ForecastPolicy(DTO):
-    enabled: Literal[False]
-    demoResidualThresholdC: float
-    maximumHorizonDays: Annotated[int, Field(gt=0)]
+    enabled: FalseFlag
+    demoResidualThresholdC: Number
+    maximumHorizonDays: Annotated[Integer, Field(gt=0)]
     label: Text
 
 
@@ -740,6 +821,6 @@ class DiagnosticPolicy(DTO):
     priority: PriorityPolicy
     conditionalForecast: ForecastPolicy
     failureProbability: None
-    allowAutoApprove: Literal[False]
-    allowOperationalCommands: Literal[False]
+    allowAutoApprove: FalseFlag
+    allowOperationalCommands: FalseFlag
     allowedActionCodes: list[ActionCode]

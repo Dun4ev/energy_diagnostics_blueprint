@@ -25,3 +25,20 @@ describe('same JSON semantics in JS', () => {
     expect(data?.data.analysis.risk.score).toBe(7.2);
   });
 });
+
+it('mock refuses a foreign run or missing case', async () => {
+  for (const [id, run] of [['AG-2026-017', 'foreign-run'], ['absent', 'reference-slide29']]) {
+    const { response } = await createApi('http://localhost').GET('/api/v1/cases/{id}/snapshot', {
+      params: { path: { id }, query: { scenarioRunId: run } },
+    });
+    expect(response.status).toBe(404);
+  }
+});
+
+it('reference queue respects filters and pagination', async () => {
+  const client = createApi('http://localhost');
+  const filtered = await client.GET('/api/v1/risks', { params: { query: { scenarioRunId: 'reference-slide29', priority: 'low' } } });
+  expect(filtered.data?.data.total).toBe(0);
+  const page = await client.GET('/api/v1/risks', { params: { query: { scenarioRunId: 'reference-slide29', limit: 1, offset: 1 } } });
+  expect(page.data?.data).toMatchObject({ items: [], total: 1, limit: 1, offset: 1 });
+});

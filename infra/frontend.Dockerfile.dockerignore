@@ -13,3 +13,10 @@
 !infra/
 !infra/nginx/
 !infra/nginx/default.conf
+
+**/__pycache__
+**/*.pyc
+**/node_modules
+**/dist
+**/.env
+**/.env.*

@@ -24,5 +24,5 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: POSTGRES_PASSWORD=ci-ephemeral docker compose -p energy-diagnostics -f infra/compose.yaml up --build -d --wait
-      - run: npx --no-install playwright install --with-deps chromium
+      - run: PLAYWRIGHT_SKIP_BROWSER_GC=1 npx --no-install playwright install --with-deps chromium
       - run: npm run test:e2e
