@@ -1,6 +1,6 @@
 {
   "scope": "Blueprint files, schema examples, design token contrast and synthetic generator only. NOT application/field validation.",
-  "checkedAt": "2026-09-27T11:08:39.277859+00:00",
+  "checkedAt": "2026-09-27T12:46:53.662232+00:00",
   "python": "3.13.5 (main, Jun 11 2025, 15:36:57) [Clang 17.0.0 (clang-1700.0.13.3)]",
   "jsonschema": "4.26.0",
   "testsRun": 19,

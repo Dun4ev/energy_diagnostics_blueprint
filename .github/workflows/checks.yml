@@ -1,4 +1,4 @@
-name: Foundation contracts
+name: Prototype checks
 on: [push, pull_request]
 jobs:
   check:
@@ -19,10 +19,11 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run contracts:check
-      - run: uv run --frozen pytest tests/contracts
+      - run: npm run test:python
       - run: uv run --frozen python tests/test_blueprint.py
       - run: npm test
       - run: npm run build
-      - run: POSTGRES_PASSWORD=ci-ephemeral docker compose -p energy-diagnostics -f infra/compose.yaml up --build -d --wait
+      - run: python3 scripts/init_local_env.py
+      - run: docker compose --env-file infra/.env -p energy-diagnostics -f infra/compose.yaml up --build -d --wait
       - run: PLAYWRIGHT_SKIP_BROWSER_GC=1 npx --no-install playwright install --with-deps chromium
       - run: npm run test:e2e

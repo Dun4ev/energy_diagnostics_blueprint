@@ -9,7 +9,7 @@ Runbook относится к интегрированному локально�
 Один раз сгенерируйте отсутствующие локальные пароли:
 
 ```bash
-python scripts/init_local_env.py
+python3 scripts/init_local_env.py
 ```
 
 Скрипт добавляет только отсутствующие ключи в `infra/.env`, устанавливает права `0600` и не показывает значения. Не коммитьте и не копируйте этот файл в worktree. Demo usernames: `engineer`, `approver`, `technician`, `viewer`, `admin`; пароли остаются в локальном `infra/.env`.
@@ -48,7 +48,7 @@ docker compose --env-file infra/.env -p energy-diagnostics -f infra/compose.yaml
 Сделайте backup запущенной локальной базы из основного checkout:
 
 ```bash
-python scripts/backup_local.py
+python3 scripts/backup_local.py
 ```
 
 Скрипт находит контейнер БД по Compose labels и вызывает `pg_dump` внутри него, не читает `.env` и не выводит пароль. Custom-format архив создается с правами `0600` в `infra/.env.backups/` с правами папки `0700`. Путь проверяется через `git check-ignore`, архив проверяется командой `pg_restore --list`, затем печатаются размер и SHA-256. Папка игнорируется Git.
@@ -56,7 +56,7 @@ python scripts/backup_local.py
 Проверьте backup, передав его путь:
 
 ```bash
-python scripts/verify_restore.py infra/.env.backups/ИМЯ_АРХИВА.dump
+python3 scripts/verify_restore.py infra/.env.backups/ИМЯ_АРХИВА.dump
 ```
 
 Проверка создает новую уникально названную database в текущем PostgreSQL cluster/named volume, восстанавливает туда архив без `--clean`, `--create` или удаления объектов и проверяет таблицы и counts. Исходная БД не изменяется; volume теперь дополнительно содержит изолированную restore database. Тестовая база сохраняется. Скрипт никогда не удаляет restore target, в том числе при ошибке. Перед повторной проверкой используйте новый backup/target; удаление тестовой БД требует отдельного ручного решения после проверки ее имени и содержимого.

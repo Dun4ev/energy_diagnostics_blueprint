@@ -93,14 +93,39 @@ function ScenarioPicker({ identity }: { identity: S['Identity'] }) {
 }
 
 export function DiagnosticsApp() {
-  const url = new URL(window.location.href);
+  const [location, setLocation] = useState(window.location.href);
+  const [online, setOnline] = useState(navigator.onLine);
+  const url = new URL(location);
   const run = url.searchParams.get('run') || (url.searchParams.has('choose') ? '' : localStorage.getItem('diagnostics-run') || '');
   const identity = useResource('auth-me', async () => expectData(await api.GET('/api/v1/auth/me')), false);
   const session = useResource(`session-${run}`, async () => {
     if (!run) throw new ApiFailure(404, 'Запуск не выбран.');
     return expectData(await api.GET('/api/v1/demo/sessions/{id}', { params: { path: { id: run } } }));
   });
-  const current = route(window.location.pathname);
+  useEffect(() => {
+    const updateLocation = () => setLocation(window.location.href);
+    const navigate = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      const link = event.target instanceof Element ? event.target.closest('a') : null;
+      if (!link || link.target || link.hasAttribute('download')) return;
+      const next = new URL(link.href);
+      if (next.origin !== window.location.origin || next.pathname === '/gallery' || (next.hash && next.pathname === window.location.pathname)) return;
+      event.preventDefault();
+      window.history.pushState(null, '', next);
+      updateLocation(); window.scrollTo(0, 0);
+    };
+    document.addEventListener('click', navigate);
+    window.addEventListener('popstate', updateLocation);
+    return () => { document.removeEventListener('click', navigate); window.removeEventListener('popstate', updateLocation); };
+  }, []);
+  useEffect(() => {
+    const connected = () => { setOnline(true); identity.refresh(); session.refresh(); };
+    const disconnected = () => setOnline(false);
+    window.addEventListener('online', connected);
+    window.addEventListener('offline', disconnected);
+    return () => { window.removeEventListener('online', connected); window.removeEventListener('offline', disconnected); };
+  }, [identity.refresh, session.refresh]);
+  const current = route(url.pathname);
   const nav: NavItem[] = featureRegistrations.map(item => ({ id: item.id, href: href(item.route, run), label: item.label, icon: icons[item.id] }));
   const processing = session.data?.data.processingStatus || 'ready';
   const canShowRun = !identity.loading && identity.error?.status !== 401;
@@ -109,24 +134,25 @@ export function DiagnosticsApp() {
     const timer = window.setInterval(session.refresh, 3000);
     return () => window.clearInterval(timer);
   }, [run, processing, session.data?.data.paused, session.refresh]);
-  const connection = identity.error?.status === 0 || session.error?.status === 0 ? 'offline' : identity.loading || session.loading ? 'loading' : 'online';
+  const connection = !online || identity.error?.status === 0 || session.error?.status === 0 ? 'offline' : identity.loading || session.loading ? 'loading' : 'online';
   async function logout() {
     if (!identity.data) return;
     try { expectData(await api.POST('/api/v1/auth/logout', { params: { header: mutationHeaders(identity.data) } })); window.location.reload(); }
     catch { identity.refresh(); }
   }
   return <AppShell nav={nav} active={current.active} mode={session.data?.mode || null} dataTime={session.data?.dataTime || null} connection={connection}
-    userLabel={identity.data?.displayName || 'Нет входа'} roleLabel={identity.data ? roleLabel[identity.data.role] : 'Просмотр'} onLogout={identity.data ? logout : undefined}
+    userLabel={identity.data?.displayName || 'Нет входа'} roleLabel={identity.data ? roleLabel[identity.data.role] : 'Просмотр'} onLogout={identity.data && online ? logout : undefined}
     breadcrumb={current.title} headerActions={run ? <a href="/?choose=1">Сменить набор</a> : undefined}>
+    {!online && <Banner tone="high" title="Нет сети">Показан последний загруженный срез. Изменения недоступны до восстановления связи.</Banner>}
     {identity.loading && !identity.data && <Loading label="Проверяем вход..." />}
     {identity.error?.status === 401 && <Login onSuccess={() => window.location.reload()} />}
     {identity.error && identity.error.status !== 401 && <Banner tone="high" title="Сервер недоступен">Сохраненные данные показаны как устаревшие. Изменения недоступны.</Banner>}
     {!identity.loading && identity.error?.status !== 401 && !run && identity.data && <ScenarioPicker identity={identity.data} />}
     {canShowRun && run && session.loading && !session.data && <Loading label="Загружаем запуск..." />}
     {canShowRun && run && session.error && !session.data && <ErrorState message={session.error.message} requestId={session.error.requestId} retry={session.refresh} />}
-    {canShowRun && run && session.data && <ReplayControls session={session.data.data} identity={session.stale ? null : identity.data} refresh={session.refresh} />}
+    {canShowRun && run && session.data && <ReplayControls session={session.data.data} identity={!online || session.stale ? null : identity.data} refresh={session.refresh} />}
     {canShowRun && run && session.data && processing !== 'ready' && <Banner tone={processing === 'failed' ? 'high' : 'blue'} title={processing === 'failed' ? 'Подготовка набора не удалась' : 'Набор подготавливается'}>{processing === 'failed' ? session.data.data.processingError || 'Проверьте журнал сервера.' : 'Данные еще не готовы для просмотра. Статус обновляется автоматически.'}</Banner>}
     {canShowRun && run && session.data && processing !== 'ready' && <Button onClick={session.refresh}>Проверить состояние</Button>}
-    {canShowRun && run && session.data && processing === 'ready' && <>{session.stale && <Banner tone="high" title="Показаны сохраненные данные">Связь с сервером потеряна; действия заблокированы.</Banner>}<div key={session.data.data.processedAt || session.data.data.virtualTime}>{current.content(run, identity.data && !identity.stale && !session.stale ? identity.data : null)}</div></>}
+    {canShowRun && run && session.data && processing === 'ready' && <>{session.stale && <Banner tone="high" title="Показаны сохраненные данные">Связь с сервером потеряна; действия заблокированы.</Banner>}<div key={session.data.data.processedAt || session.data.data.virtualTime}>{current.content(run, online && identity.data && !identity.stale && !session.stale ? identity.data : null)}</div></>}
   </AppShell>;
 }

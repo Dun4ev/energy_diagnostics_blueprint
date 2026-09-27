@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import * as echarts from 'echarts';
+import { brand } from '../config';
 import { DataTable, Empty } from '../design-system/components';
 import { date, pointQualityLabel, temperature, type SeriesPoint } from './shared';
 
@@ -13,7 +14,7 @@ export function TemperatureChart({ points, residual = false }: { points: SeriesP
     const expected = tokens.getPropertyValue('--chart-expected').trim();
     const residualColor = tokens.getPropertyValue('--risk-medium-text').trim();
     const shortRange = new Date(points[points.length - 1].eventTime).getTime() - new Date(points[0].eventTime).getTime() <= 48 * 3600000;
-    const axisTime = new Intl.DateTimeFormat('ru-RU', shortRange ? { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' } : { day: '2-digit', month: '2-digit', timeZone: 'UTC' });
+    const axisTime = new Intl.DateTimeFormat('ru-RU', shortRange ? { hour: '2-digit', minute: '2-digit', timeZone: brand.timezone } : { day: '2-digit', month: '2-digit', timeZone: brand.timezone });
     const series = residual ? [
       { name: 'Отклонение', type: 'line' as const, showSymbol: false, connectNulls: false,
         itemStyle: { color: residualColor }, lineStyle: { color: residualColor, width: 2 },
@@ -27,15 +28,15 @@ export function TemperatureChart({ points, residual = false }: { points: SeriesP
         data: points.map(point => [point.eventTime, point.expectedC]) },
     ];
     chart.setOption({
-      animation: false, color: residual ? [residualColor] : [observed, expected],
+      animation: false, useUTC: true, color: residual ? [residualColor] : [observed, expected],
       grid: { left: 47, right: 16, top: 48, bottom: 42 },
       legend: { top: 6, left: 0, textStyle: { color: '#52677A', fontSize: 12 } },
-      tooltip: { trigger: 'axis', valueFormatter: (value: unknown) => typeof value === 'number' ? `${value.toFixed(1)} °C` : 'Нет данных' },
-      xAxis: { type: 'time', axisLabel: { color: '#52677A', fontSize: 11, formatter: (value: number) => axisTime.format(new Date(value)) }, axisLine: { lineStyle: { color: '#D6E2EC' } } },
+      tooltip: { trigger: 'axis', renderMode: 'richText', valueFormatter: (value: unknown) => typeof value === 'number' ? `${value.toFixed(1)} °C` : 'Нет данных' },
+      xAxis: { type: 'time', splitNumber: ref.current.clientWidth < 450 ? 3 : 6, axisPointer: { label: { formatter: (params: { value: number }) => date(new Date(params.value).toISOString()) } }, axisLabel: { hideOverlap: true, color: '#52677A', fontSize: 12, formatter: (value: number) => axisTime.format(new Date(value)) }, axisLine: { lineStyle: { color: '#D6E2EC' } } },
       yAxis: { type: 'value', name: '°C', scale: true, nameTextStyle: { color: '#52677A' }, axisLabel: { color: '#52677A' }, splitLine: { lineStyle: { color: '#E7EEF4' } } },
       series,
     });
-    const resize = new ResizeObserver(() => chart.resize());
+    const resize = new ResizeObserver(() => { chart.resize(); chart.setOption({ xAxis: { splitNumber: (ref.current?.clientWidth || 600) < 450 ? 3 : 6 } }); });
     resize.observe(ref.current);
     return () => { resize.disconnect(); chart.dispose(); };
   }, [points, residual]);

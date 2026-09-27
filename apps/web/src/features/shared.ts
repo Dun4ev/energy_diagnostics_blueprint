@@ -113,3 +113,18 @@ export function exportJson(name: string, value: unknown) {
 export const mutationHeaders = (identity: Identity) => ({
   'Idempotency-Key': crypto.randomUUID(), 'X-CSRF-Token': identity.csrfToken,
 });
+
+export function locationLabel(value: string) {
+  return value === 'synthetic phase A contact; not a real installed sensor'
+    ? 'Синтетическая точка на контакте фазы A; реальный датчик не установлен'
+    : value;
+}
+export function auditLabel(value: string) {
+  if (value === 'case.analysis_updated') return 'Опубликован новый расчет';
+  if (value === 'evidence.add') return 'Добавлена запись';
+  if (value.startsWith('case.')) return (stateLabel as Record<string, string>)[value.slice(5)] || value;
+  if (value.startsWith('plan.')) return (planStateLabel as Record<string, string>)[value.slice(5)] || value;
+  if (value.startsWith('step.result:')) return 'Записан результат шага';
+  return value;
+}
+export const actorLabel = (value: string) => value === 'system-analysis' ? 'Расчетный сервис' : (roleLabel as Record<string, string>)[value] || value;

@@ -15,7 +15,8 @@
     "contracts:generate": "uv run --frozen python -m packages.domain_contracts.export && openapi-typescript contracts/openapi.json -o apps/web/src/api/generated.ts",
     "contracts:check": "uv run --frozen python -m packages.domain_contracts.export --check && node scripts/check-client.mjs",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:python": "uv run --frozen pytest tests/contracts tests/ingestion tests/diagnostics tests/api tests/integration tests/independent-core tests/independent-workflow"
   },
   "dependencies": {
     "@tanstack/react-query": "5.104.0",
