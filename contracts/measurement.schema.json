@@ -1,88 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "measurement v0.1.0",
-  "type": "object",
   "additionalProperties": false,
-  "properties": {
-    "schemaVersion": {
-      "const": "0.1.0"
-    },
-    "measurementId": {
-      "type": "string",
-      "minLength": 1
-    },
-    "assetId": {
-      "type": "string",
-      "minLength": 1
-    },
-    "sourceId": {
-      "type": "string",
-      "minLength": 1
-    },
-    "metric": {
-      "enum": [
-        "contact_temperature",
-        "ambient_temperature",
-        "load_fraction",
-        "closing_time",
-        "relative_pd_indicator"
-      ]
-    },
-    "eventTime": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "receivedAt": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "value": {
-      "type": [
-        "number",
-        "null"
-      ]
-    },
-    "unit": {
-      "enum": [
-        "degC",
-        "fraction",
-        "ms",
-        "dB_ref_demo"
-      ]
-    },
-    "quality": {
-      "enum": [
-        "good",
-        "missing",
-        "suspect",
-        "invalid"
-      ]
-    },
-    "origin": {
-      "enum": [
-        "synthetic",
-        "field"
-      ]
-    },
-    "scenarioRunId": {
-      "type": "string",
-      "minLength": 1
-    }
-  },
-  "required": [
-    "schemaVersion",
-    "measurementId",
-    "assetId",
-    "sourceId",
-    "metric",
-    "eventTime",
-    "receivedAt",
-    "value",
-    "unit",
-    "quality",
-    "origin",
-    "scenarioRunId"
-  ],
   "allOf": [
     {
       "if": {
@@ -207,15 +125,122 @@
       "then": {
         "properties": {
           "value": {
+            "maximum": 2,
+            "minimum": 0,
             "type": [
               "number",
               "null"
-            ],
-            "minimum": 0,
-            "maximum": 2
+            ]
           }
         }
       }
     }
-  ]
+  ],
+  "properties": {
+    "assetId": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Assetid",
+      "type": "string"
+    },
+    "eventTime": {
+      "format": "date-time",
+      "title": "Eventtime",
+      "type": "string"
+    },
+    "measurementId": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Measurementid",
+      "type": "string"
+    },
+    "metric": {
+      "enum": [
+        "contact_temperature",
+        "ambient_temperature",
+        "load_fraction",
+        "closing_time",
+        "relative_pd_indicator"
+      ],
+      "title": "Metric",
+      "type": "string"
+    },
+    "origin": {
+      "enum": [
+        "synthetic",
+        "field"
+      ],
+      "title": "Origin",
+      "type": "string"
+    },
+    "quality": {
+      "enum": [
+        "good",
+        "missing",
+        "suspect",
+        "invalid"
+      ],
+      "title": "Quality",
+      "type": "string"
+    },
+    "receivedAt": {
+      "format": "date-time",
+      "title": "Receivedat",
+      "type": "string"
+    },
+    "scenarioRunId": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Scenariorunid",
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": "0.1.0",
+      "title": "Schemaversion",
+      "type": "string"
+    },
+    "sourceId": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Sourceid",
+      "type": "string"
+    },
+    "unit": {
+      "enum": [
+        "degC",
+        "fraction",
+        "ms",
+        "dB_ref_demo"
+      ],
+      "title": "Unit",
+      "type": "string"
+    },
+    "value": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Value"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "measurementId",
+    "assetId",
+    "sourceId",
+    "metric",
+    "eventTime",
+    "receivedAt",
+    "value",
+    "unit",
+    "quality",
+    "origin",
+    "scenarioRunId"
+  ],
+  "title": "Measurement",
+  "type": "object"
 }

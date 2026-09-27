@@ -1,0 +1,119 @@
+{
+  "caseTargetPermission": {
+    "awaiting_evidence": "case.review",
+    "closed": "case.close",
+    "confirmed": "case.confirm",
+    "detected": "case.review",
+    "not_confirmed": "case.review",
+    "remediation_planned": "case.review",
+    "sensor_issue": "case.review",
+    "under_review": "case.review",
+    "verification": "case.review"
+  },
+  "caseTransitions": {
+    "awaiting_evidence": [
+      "confirmed",
+      "not_confirmed",
+      "sensor_issue"
+    ],
+    "closed": [],
+    "confirmed": [
+      "remediation_planned"
+    ],
+    "detected": [
+      "under_review"
+    ],
+    "not_confirmed": [
+      "verification"
+    ],
+    "remediation_planned": [
+      "verification"
+    ],
+    "sensor_issue": [
+      "verification"
+    ],
+    "under_review": [
+      "awaiting_evidence"
+    ],
+    "verification": [
+      "closed",
+      "under_review"
+    ]
+  },
+  "explicitGrantOnly": [
+    "case.confirm"
+  ],
+  "planTargetPermission": {
+    "approved": "plan.approve",
+    "awaiting_verification": "step.result",
+    "cancelled": "plan.approve",
+    "completed": "plan.approve",
+    "draft": "plan.edit",
+    "in_progress": "step.result",
+    "rejected": "plan.approve",
+    "submitted": "plan.edit",
+    "superseded": "plan.approve"
+  },
+  "planTransitions": {
+    "approved": [
+      "cancelled",
+      "in_progress",
+      "superseded"
+    ],
+    "awaiting_verification": [
+      "cancelled",
+      "completed",
+      "in_progress",
+      "superseded"
+    ],
+    "cancelled": [],
+    "completed": [],
+    "draft": [
+      "cancelled",
+      "submitted"
+    ],
+    "in_progress": [
+      "awaiting_verification",
+      "cancelled",
+      "superseded"
+    ],
+    "rejected": [
+      "cancelled",
+      "draft",
+      "superseded"
+    ],
+    "submitted": [
+      "approved",
+      "cancelled",
+      "rejected",
+      "superseded"
+    ],
+    "superseded": []
+  },
+  "rolePermissions": {
+    "admin": [
+      "admin.users",
+      "read"
+    ],
+    "approver": [
+      "case.close",
+      "plan.approve",
+      "read"
+    ],
+    "engineer": [
+      "case.review",
+      "demo.advance",
+      "evidence.add",
+      "plan.edit",
+      "read"
+    ],
+    "technician": [
+      "evidence.add",
+      "read",
+      "step.result"
+    ],
+    "viewer": [
+      "read"
+    ]
+  }
+}

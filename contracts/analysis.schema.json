@@ -1,155 +1,88 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "analysis v0.1.0",
-  "type": "object",
-  "additionalProperties": false,
-  "properties": {
-    "schemaVersion": {
-      "const": "0.1.0"
-    },
-    "analysisRunId": {
-      "type": "string",
-      "minLength": 1
-    },
-    "assetId": {
-      "type": "string",
-      "minLength": 1
-    },
-    "scenarioRunId": {
-      "type": "string",
-      "minLength": 1
-    },
-    "asOf": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "mode": {
-      "enum": [
-        "reference",
-        "simulation"
-      ]
-    },
-    "status": {
-      "enum": [
-        "normal",
-        "requires_review",
-        "insufficient_data"
-      ]
-    },
-    "modelVersion": {
-      "type": [
-        "string",
-        "null"
-      ]
-    },
-    "policyVersion": {
-      "type": [
-        "string",
-        "null"
-      ]
-    },
-    "inputSnapshotId": {
-      "type": "string",
-      "minLength": 1
-    },
-    "calculationOrigin": {
-      "enum": [
-        "presentation_illustration",
-        "computed"
-      ]
-    },
-    "quality": {
-      "type": "object",
+  "$defs": {
+    "AnalysisMetrics": {
       "additionalProperties": false,
       "properties": {
-        "overall": {
-          "enum": [
-            "good",
-            "partial",
-            "insufficient",
-            "invalid"
-          ]
-        },
-        "freshSources": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "totalSources": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "coverage": {
-          "type": [
-            "number",
-            "null"
+        "ambientC": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
           ],
-          "minimum": 0,
-          "maximum": 1
-        },
-        "issues": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "minLength": 1
-          }
-        }
-      },
-      "required": [
-        "overall",
-        "freshSources",
-        "totalSources",
-        "coverage",
-        "issues"
-      ]
-    },
-    "metrics": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "observedTemperatureC": {
-          "type": [
-            "number",
-            "null"
-          ]
+          "title": "Ambientc"
         },
         "expectedTemperatureC": {
-          "type": [
-            "number",
-            "null"
-          ]
-        },
-        "residualC": {
-          "type": [
-            "number",
-            "null"
-          ]
-        },
-        "loadFraction": {
-          "type": [
-            "number",
-            "null"
-          ]
-        },
-        "ambientC": {
-          "type": [
-            "number",
-            "null"
-          ]
-        },
-        "slopeCPerDay": {
-          "type": [
-            "number",
-            "null"
-          ]
-        },
-        "trendWindowHours": {
-          "type": [
-            "integer",
-            "null"
-          ]
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Expectedtemperaturec"
         },
         "failureProbability": {
+          "title": "Failureprobability",
           "type": "null"
+        },
+        "loadFraction": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Loadfraction"
+        },
+        "observedTemperatureC": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Observedtemperaturec"
+        },
+        "residualC": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Residualc"
+        },
+        "slopeCPerDay": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Slopecperday"
+        },
+        "trendWindowHours": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Trendwindowhours"
         }
       },
       "required": [
@@ -161,22 +94,213 @@
         "slopeCPerDay",
         "trendWindowHours",
         "failureProbability"
-      ]
+      ],
+      "title": "AnalysisMetrics",
+      "type": "object"
     },
-    "risk": {
-      "type": "object",
+    "AnalysisQuality": {
       "additionalProperties": false,
       "properties": {
-        "score": {
-          "type": [
-            "number",
-            "null"
+        "coverage": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
           ],
-          "minimum": 0,
-          "maximum": 10
+          "title": "Coverage"
         },
-        "scaleMax": {
-          "const": 10
+        "freshSources": {
+          "minimum": 0,
+          "title": "Freshsources",
+          "type": "integer"
+        },
+        "issues": {
+          "items": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Issues",
+          "type": "array"
+        },
+        "overall": {
+          "enum": [
+            "good",
+            "partial",
+            "insufficient",
+            "invalid"
+          ],
+          "title": "Overall",
+          "type": "string"
+        },
+        "totalSources": {
+          "minimum": 0,
+          "title": "Totalsources",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "overall",
+        "freshSources",
+        "totalSources",
+        "coverage",
+        "issues"
+      ],
+      "title": "AnalysisQuality",
+      "type": "object"
+    },
+    "Hypothesis": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Code",
+          "type": "string"
+        },
+        "missingEvidence": {
+          "items": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Missingevidence",
+          "type": "array"
+        },
+        "status": {
+          "const": "unconfirmed",
+          "title": "Status",
+          "type": "string"
+        },
+        "supportEvidenceIds": {
+          "items": {
+            "maxLength": 128,
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Supportevidenceids",
+          "type": "array"
+        },
+        "title": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "title",
+        "status",
+        "supportEvidenceIds",
+        "missingEvidence"
+      ],
+      "title": "Hypothesis",
+      "type": "object"
+    },
+    "MonitoringWindow": {
+      "additionalProperties": false,
+      "properties": {
+        "isFailureDateForecast": {
+          "const": false,
+          "title": "Isfailuredateforecast",
+          "type": "boolean"
+        },
+        "maxDays": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Maxdays"
+        },
+        "minDays": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Mindays"
+        }
+      },
+      "required": [
+        "minDays",
+        "maxDays",
+        "isFailureDateForecast"
+      ],
+      "title": "MonitoringWindow",
+      "type": "object"
+    },
+    "NextAction": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "VERIFY_TELEMETRY",
+            "REQUEST_THERMOGRAPHY",
+            "COMPARE_PHASES_AND_LOAD",
+            "ENGINEERING_REVIEW",
+            "PLAN_MAINTENANCE_IF_CONFIRMED",
+            "VERIFY_AFTER_ACTION",
+            "CONTINUE_OBSERVATION"
+          ],
+          "title": "Code",
+          "type": "string"
+        },
+        "dueWithinHours": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Duewithinhours"
+        },
+        "reason": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "requiresHumanApproval": {
+          "const": true,
+          "title": "Requireshumanapproval",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "code",
+        "reason",
+        "dueWithinHours",
+        "requiresHumanApproval"
+      ],
+      "title": "NextAction",
+      "type": "object"
+    },
+    "Risk": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
         },
         "priority": {
           "enum": [
@@ -184,14 +308,32 @@
             "medium",
             "high",
             "unknown"
-          ]
-        },
-        "label": {
-          "type": "string",
-          "minLength": 1
+          ],
+          "title": "Priority",
+          "type": "string"
         },
         "probabilistic": {
-          "const": false
+          "const": false,
+          "title": "Probabilistic",
+          "type": "boolean"
+        },
+        "scaleMax": {
+          "const": 10,
+          "title": "Scalemax",
+          "type": "integer"
+        },
+        "score": {
+          "anyOf": [
+            {
+              "maximum": 10,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Score"
         }
       },
       "required": [
@@ -200,143 +342,13 @@
         "priority",
         "label",
         "probabilistic"
-      ]
-    },
-    "hypotheses": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "code": {
-            "type": "string",
-            "minLength": 1
-          },
-          "title": {
-            "type": "string",
-            "minLength": 1
-          },
-          "status": {
-            "const": "unconfirmed"
-          },
-          "supportEvidenceIds": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "minLength": 1
-            }
-          },
-          "missingEvidence": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "minLength": 1
-            }
-          }
-        },
-        "required": [
-          "code",
-          "title",
-          "status",
-          "supportEvidenceIds",
-          "missingEvidence"
-        ]
-      }
-    },
-    "nextActions": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "code": {
-            "enum": [
-              "VERIFY_TELEMETRY",
-              "REQUEST_THERMOGRAPHY",
-              "COMPARE_PHASES_AND_LOAD",
-              "ENGINEERING_REVIEW",
-              "PLAN_MAINTENANCE_IF_CONFIRMED",
-              "VERIFY_AFTER_ACTION",
-              "CONTINUE_OBSERVATION"
-            ]
-          },
-          "reason": {
-            "type": "string",
-            "minLength": 1
-          },
-          "dueWithinHours": {
-            "type": [
-              "number",
-              "null"
-            ],
-            "exclusiveMinimum": 0
-          },
-          "requiresHumanApproval": {
-            "const": true
-          }
-        },
-        "required": [
-          "code",
-          "reason",
-          "dueWithinHours",
-          "requiresHumanApproval"
-        ]
-      }
-    },
-    "monitoringWindow": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "minDays": {
-          "type": [
-            "number",
-            "null"
-          ]
-        },
-        "maxDays": {
-          "type": [
-            "number",
-            "null"
-          ]
-        },
-        "isFailureDateForecast": {
-          "const": false
-        }
-      },
-      "required": [
-        "minDays",
-        "maxDays",
-        "isFailureDateForecast"
-      ]
-    },
-    "advisoryOnly": {
-      "const": true
-    },
-    "controlCommandsAllowed": {
-      "const": false
+      ],
+      "title": "Risk",
+      "type": "object"
     }
   },
-  "required": [
-    "schemaVersion",
-    "analysisRunId",
-    "assetId",
-    "scenarioRunId",
-    "asOf",
-    "mode",
-    "status",
-    "modelVersion",
-    "policyVersion",
-    "inputSnapshotId",
-    "calculationOrigin",
-    "quality",
-    "metrics",
-    "risk",
-    "hypotheses",
-    "nextActions",
-    "monitoringWindow",
-    "advisoryOnly",
-    "controlCommandsAllowed"
-  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
   "allOf": [
     {
       "if": {
@@ -368,15 +380,161 @@
             "const": "computed"
           },
           "modelVersion": {
-            "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "type": "string"
           },
           "policyVersion": {
-            "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "type": "string"
           }
         }
       }
     }
-  ]
+  ],
+  "properties": {
+    "advisoryOnly": {
+      "const": true,
+      "title": "Advisoryonly",
+      "type": "boolean"
+    },
+    "analysisRunId": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Analysisrunid",
+      "type": "string"
+    },
+    "asOf": {
+      "format": "date-time",
+      "title": "Asof",
+      "type": "string"
+    },
+    "assetId": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Assetid",
+      "type": "string"
+    },
+    "calculationOrigin": {
+      "enum": [
+        "presentation_illustration",
+        "computed"
+      ],
+      "title": "Calculationorigin",
+      "type": "string"
+    },
+    "controlCommandsAllowed": {
+      "const": false,
+      "title": "Controlcommandsallowed",
+      "type": "boolean"
+    },
+    "hypotheses": {
+      "items": {
+        "$ref": "#/$defs/Hypothesis"
+      },
+      "title": "Hypotheses",
+      "type": "array"
+    },
+    "inputSnapshotId": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Inputsnapshotid",
+      "type": "string"
+    },
+    "metrics": {
+      "$ref": "#/$defs/AnalysisMetrics"
+    },
+    "mode": {
+      "enum": [
+        "reference",
+        "simulation"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "modelVersion": {
+      "anyOf": [
+        {
+          "maxLength": 4000,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Modelversion"
+    },
+    "monitoringWindow": {
+      "$ref": "#/$defs/MonitoringWindow"
+    },
+    "nextActions": {
+      "items": {
+        "$ref": "#/$defs/NextAction"
+      },
+      "title": "Nextactions",
+      "type": "array"
+    },
+    "policyVersion": {
+      "anyOf": [
+        {
+          "maxLength": 4000,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Policyversion"
+    },
+    "quality": {
+      "$ref": "#/$defs/AnalysisQuality"
+    },
+    "risk": {
+      "$ref": "#/$defs/Risk"
+    },
+    "scenarioRunId": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Scenariorunid",
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": "0.1.0",
+      "title": "Schemaversion",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "normal",
+        "requires_review",
+        "insufficient_data"
+      ],
+      "title": "Status",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "analysisRunId",
+    "assetId",
+    "scenarioRunId",
+    "asOf",
+    "mode",
+    "status",
+    "modelVersion",
+    "policyVersion",
+    "inputSnapshotId",
+    "calculationOrigin",
+    "quality",
+    "metrics",
+    "risk",
+    "hypotheses",
+    "nextActions",
+    "monitoringWindow",
+    "advisoryOnly",
+    "controlCommandsAllowed"
+  ],
+  "title": "AnalysisResult",
+  "type": "object"
 }

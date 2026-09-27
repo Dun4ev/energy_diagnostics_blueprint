@@ -1,6 +1,10 @@
 # Контракты v0.1.0: точка синхронизации модулей
 
-## Статус
+## Реализация этапа 01
+
+Канонические DTO находятся в `packages/domain_contracts/models.py`; OpenAPI и обе JSON Schema генерируются командой `npm run contracts:generate`. Drift проверяется через `npm run contracts:check`. Референсные примеры сохранены; дополнительные согласованные fixtures в `contracts/fixtures`. Все бизнес-маршруты пока stubs501. См. `handoffs/RFC-foundation-contracts.md` и `contracts/NUMERICAL_ACCEPTANCE.md`.
+
+## Исходный статус blueprint
 
 В пакете уже есть валидируемые JSON Schema для `Measurement` и `AnalysisResult`, плюс reference fixtures. Это исходный контракт ядра, **не полный готовый OpenAPI**. Примеры очереди/плана/схемы пока являются источниками требований. Интегратор на этапе 01 дополняет `Asset`, `Case`, `Evidence`, `WorkPlan`, `Approval`, `RiskEntry`, `ScenarioSession`, ошибки и paginated responses, генерирует OpenAPI и типы TS. Параллельную feature-разработку запускать только после этой фиксации.
 

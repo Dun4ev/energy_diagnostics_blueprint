@@ -219,7 +219,7 @@ class BlueprintChecks(unittest.TestCase):
             self.assertIn("OWNED",text)
             self.assertIn("READ-ONLY",text)
             self.assertIn("Приёмка",text)
-        self.assertTrue((ROOT/"design.md").exists())
+        self.assertTrue((ROOT/"DESIGN.md").exists())
         self.assertTrue((ROOT/"references/slide-29.png").exists())
 
 

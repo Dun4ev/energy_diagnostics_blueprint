@@ -1,0 +1,128 @@
+{
+  "schemaVersion": "0.1.0",
+  "mode": "reference",
+  "scenarioRunId": "reference-slide29",
+  "dataTime": "2026-07-24T07:42:00Z",
+  "requestId": "reference-fixture",
+  "data": {
+    "snapshotId": "reference-snapshot-1",
+    "case": {
+      "caseId": "AG-2026-017",
+      "scenarioRunId": "reference-slide29",
+      "assetId": "tp177-t1",
+      "symptomFamily": "contact_heat",
+      "state": "under_review",
+      "revision": 1,
+      "evidenceRevision": 1,
+      "analysisRunId": "reference-ag-2026-017-r1",
+      "openedAt": "2026-07-24T07:42:00Z",
+      "assignedTo": null,
+      "outcome": null
+    },
+    "asset": {
+      "assetId": "tp177-t1",
+      "name": "ТП-177 / Т-1",
+      "assetType": "transformer",
+      "siteId": "demo-site",
+      "parentId": null,
+      "measurementLocation": "Точка измерения не уточнена",
+      "demoConsequenceWeight": 0.5,
+      "calibration": null
+    },
+    "analysis": {
+      "schemaVersion": "0.1.0",
+      "analysisRunId": "reference-ag-2026-017-r1",
+      "assetId": "tp177-t1",
+      "scenarioRunId": "reference-slide29",
+      "asOf": "2026-07-24T07:42:00Z",
+      "mode": "reference",
+      "status": "requires_review",
+      "modelVersion": null,
+      "policyVersion": null,
+      "inputSnapshotId": "source-slide29",
+      "calculationOrigin": "presentation_illustration",
+      "quality": {
+        "overall": "partial",
+        "freshSources": 3,
+        "totalSources": 4,
+        "coverage": null,
+        "issues": [
+          "Термограмма требует обновления по условиям иллюстрации.",
+          "Историческая полнота не указана в источнике."
+        ]
+      },
+      "metrics": {
+        "observedTemperatureC": 80,
+        "expectedTemperatureC": 68,
+        "residualC": 12,
+        "loadFraction": 0.74,
+        "ambientC": 27,
+        "slopeCPerDay": null,
+        "trendWindowHours": null,
+        "failureProbability": null
+      },
+      "risk": {
+        "score": 7.2,
+        "scaleMax": 10,
+        "priority": "high",
+        "label": "Пилотная шкала из презентации; формула не предоставлена",
+        "probabilistic": false
+      },
+      "hypotheses": [
+        {
+          "code": "local_contact_heating",
+          "title": "Локальный нагрев контактного соединения",
+          "status": "unconfirmed",
+          "supportEvidenceIds": [],
+          "missingEvidence": [
+            "Точное место измерения температуры",
+            "Свежая подтверждённая термография",
+            "Сопоставление фаз"
+          ]
+        }
+      ],
+      "nextActions": [
+        {
+          "code": "VERIFY_TELEMETRY",
+          "reason": "Проверить телеметрию и калибровку датчика",
+          "dueWithinHours": null,
+          "requiresHumanApproval": true
+        },
+        {
+          "code": "REQUEST_THERMOGRAPHY",
+          "reason": "На слайде: осмотр не позднее 48 часов; точка отсчёта требует уточнения",
+          "dueWithinHours": 48,
+          "requiresHumanApproval": true
+        }
+      ],
+      "monitoringWindow": {
+        "minDays": 7,
+        "maxDays": 14,
+        "isFailureDateForecast": false
+      },
+      "advisoryOnly": true,
+      "controlCommandsAllowed": false
+    },
+    "details": {
+      "analysisRunId": "reference-ag-2026-017-r1",
+      "inputWindow": {
+        "start": "2026-07-10T07:42:00Z",
+        "end": "2026-07-24T07:42:00Z",
+        "replayReceivedAt": "2026-07-24T07:42:00Z"
+      },
+      "inputSnapshotHash": null,
+      "trends": [],
+      "persistenceMinutes": null,
+      "counterEvidenceIds": [],
+      "methodStatus": "reference",
+      "methodReason": "Иллюстрация; расчет не выполнялся",
+      "forecastEnabled": false
+    },
+    "evidence": [],
+    "topology": {
+      "nodes": [],
+      "edges": [],
+      "label": "Схема модели; состояние не подтверждено"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+**
+!package.json
+!package-lock.json
+!tsconfig.json
+!apps/
+!apps/web/
+!apps/web/**
+!config/
+!config/**
+!contracts/
+!contracts/fixtures/
+!contracts/fixtures/**
+!infra/
+!infra/nginx/
+!infra/nginx/default.conf

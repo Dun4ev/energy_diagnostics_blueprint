@@ -1,0 +1,83 @@
+services:
+  db:
+    image: postgres:17.6-alpine3.22
+    environment:
+      POSTGRES_DB: energy_diagnostics
+      POSTGRES_USER: energy_diagnostics
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in infra/.env}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  api:
+    build:
+      context: ..
+      dockerfile: infra/backend.Dockerfile
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: energy_diagnostics
+      DB_USER: energy_diagnostics
+      DB_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in infra/.env}
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health', timeout=2).read()",
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+
+  worker:
+    build:
+      context: ..
+      dockerfile: infra/backend.Dockerfile
+    command: ["python", "-m", "apps.worker.main"]
+    environment:
+      WORKER_ENABLED: "false"
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: energy_diagnostics
+      DB_USER: energy_diagnostics
+      DB_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in infra/.env}
+    volumes:
+      - type: bind
+        source: ../data/observations
+        target: /app/data/observations
+        read_only: true
+        bind:
+          create_host_path: false
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ..
+      dockerfile: infra/frontend.Dockerfile
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 5s
+
+volumes:
+  postgres-data:
