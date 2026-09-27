@@ -81,11 +81,21 @@ def health():
         database = "ready"
     except Exception:
         database = "unavailable" if os.getenv("DB_HOST") else "unconfigured"
+    runtime = "degraded"
+    if database == "ready":
+        try:
+            from apps.worker.replay import RuntimeRow
+            with factory()() as session:
+                row = session.get(RuntimeRow, "worker")
+                if row and (p.utc_now()-datetime.fromisoformat(row.body["at"])).total_seconds() < 120:
+                    runtime = "ready"
+        except Exception:
+            pass
     result = m.Health(
-        status="ok" if database == "ready" else "degraded",
-        stage="foundation",
+        status="ok" if database == "ready" and runtime == "ready" else "degraded",
+        stage="integrated",
         database=database,
-        businessRuntime="not_implemented",
+        businessRuntime=runtime,
         advisoryOnly=True,
         controlCommandsAllowed=False,
         externalAiEnabled=False,
@@ -519,14 +529,26 @@ def step_result(id: str, body: m.StepResult, request: Request, run: Run, headers
 def scenarios(request: Request):
     with factory()() as session:
         actor(session, request)
-    return stub(request)
+    from apps.worker.replay import catalog
+    values = catalog()
+    return page(values, len(values), 0, 100)
 
 
 @app.post("/api/v1/demo/sessions", response_model=m.Envelope[m.ScenarioSession], responses=ERRORS)
 def create_session(body: m.SessionCreate, request: Request, headers: MutationHeaders):
-    with factory()() as session:
-        actor(session, request, m.Permission.DEMO_ADVANCE, headers[1])
-    return stub(request)
+    from apps.worker.replay import new_run
+    with factory().begin() as session:
+        user = actor(session, request, m.Permission.DEMO_ADVANCE, headers[1])
+        scope = p.idempotency_scope(user.id, "new-run", request.method, request.url.path, headers[0])
+        digest = p.payload_hash(body.model_dump_json().encode())
+        p.idempotency_lock(session, scope)
+        prior = p.idempotent_result(session, scope, digest)
+        if prior is not None:
+            return prior
+        run = new_run(session, body, user.id, request.state.request_id)
+        value = envelope(p.get_run(session, run.scenarioRunId), request, run).model_dump(mode="json")
+        p.remember_result(session, scope, digest, value)
+        return value
 
 
 @app.get(
@@ -545,9 +567,12 @@ def get_session(id: str, request: Request):
     responses=ERRORS,
 )
 def advance(id: str, body: m.SessionAdvance, request: Request, headers: MutationHeaders):
-    with factory()() as session:
-        actor(session, request, m.Permission.DEMO_ADVANCE, headers[1])
-    return stub(request)
+    from apps.worker.replay import advance_run
+    def action(session, user):
+        row = session.scalar(select(db.RunRow).where(db.RunRow.id == id).with_for_update())
+        p.require(row is not None, "NOT_FOUND", "Сеанс не найден", 404)
+        return advance_run(session, row, body, user.id, request.state.request_id)
+    return mutate(request, id, headers, body, m.Permission.DEMO_ADVANCE, action)
 
 
 @app.get("/api/v1/models", response_model=m.Envelope[m.Page[m.ModelInfo]], responses=ERRORS)
@@ -555,7 +580,12 @@ def models(request: Request, run: Run):
     with factory()() as session:
         actor(session, request)
         context = p.get_run(session, run)
-        return envelope(context, request, page([], 0, 0, 100))
+        from packages.diagnostics.core import MODEL_VERSION
+        policy = m.DiagnosticPolicy.model_validate_json(Path(os.getenv(
+            "DIAGNOSTIC_POLICY_PATH", "config/diagnostic-policy.demo.json")).read_text())
+        value = m.ModelInfo(modelVersion=MODEL_VERSION, policyVersion=policy.version,
+                            supportedAssetTypes=["transformer"], advisoryOnly=True, forecastEnabled=False)
+        return envelope(context, request, page([value], 1, 0, 100))
 
 
 @app.get("/api/v1/sources", response_model=m.Envelope[m.Page[m.Source]], responses=ERRORS)

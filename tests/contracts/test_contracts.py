@@ -120,16 +120,12 @@ def test_transition_maps_are_complete_and_no_implicit_confirm():
     assert ROLE_PERMISSIONS[m.Role.VIEWER] == {m.Permission.READ}
 
 
-def test_api_stubs_and_safe_validation(monkeypatch):
+def test_api_unconfigured_health_and_safe_validation(monkeypatch):
     monkeypatch.delenv("DB_HOST", raising=False)
-    with TestClient(app) as client:
+    with TestClient(app, headers={"Origin": "http://localhost:8080"}) as client:
         response = client.get("/api/v1/health")
         assert response.status_code == 503
-        assert response.json()["businessRuntime"] == "not_implemented"
-        response = client.get("/api/v1/risks?scenarioRunId=reference-slide29")
-        assert response.status_code == 501
-        assert response.json()["code"] == "NOT_IMPLEMENTED"
-        assert response.headers["x-request-id"] == response.json()["requestId"]
+        assert response.json()["businessRuntime"] == "degraded"
         response = client.post(
             "/api/v1/auth/login", json={"username": "x", "password": "private", "role": "approver"}
         )

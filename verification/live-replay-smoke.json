@@ -1,0 +1,28 @@
+{
+  "reference": {
+    "run": "be702efb-9a0f-42b0-b7d7-3c46d8d30042",
+    "seconds": 0.57,
+    "assets": 1,
+    "cases": 1,
+    "priorities": {
+      "tp177-t1": "high"
+    }
+  },
+  "simulation": {
+    "run": "065d2d73-c7f2-452d-a7b1-cf384a17479c",
+    "seconds": 4.17,
+    "assets": 9,
+    "cases": 2,
+    "priorities": {
+      "tp309-t1": "high",
+      "tp177-t1": "medium",
+      "kl10-section": "unknown",
+      "rp4-breaker": "unknown",
+      "tp306-t1": "unknown",
+      "tp307-t1": "unknown",
+      "tp204-t2": "low",
+      "tp305-t1": "low",
+      "tp308-t1": "low"
+    }
+  }
+}

@@ -24,6 +24,21 @@ services:
       DB_NAME: energy_diagnostics
       DB_USER: energy_diagnostics
       DB_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in infra/.env}
+      API_REFERENCE_FIXTURE_PATH: /app/reference/reference-snapshot.json
+      API_REFERENCE_EXAMPLES_DIR: /app/reference-examples
+      DIAGNOSTIC_POLICY_PATH: /app/config/diagnostic-policy.demo.json
+
+      DEMO_ENGINEER_PASSWORD: ${DEMO_ENGINEER_PASSWORD:?Run scripts/init_local_env.py}
+      DEMO_APPROVER_PASSWORD: ${DEMO_APPROVER_PASSWORD:?Run scripts/init_local_env.py}
+      DEMO_TECHNICIAN_PASSWORD: ${DEMO_TECHNICIAN_PASSWORD:?Run scripts/init_local_env.py}
+      DEMO_VIEWER_PASSWORD: ${DEMO_VIEWER_PASSWORD:?Run scripts/init_local_env.py}
+      DEMO_ADMIN_PASSWORD: ${DEMO_ADMIN_PASSWORD:?Run scripts/init_local_env.py}
+      DEMO_ENGINEER_CASE_CONFIRM: "true"
+      API_ALLOWED_ORIGINS: http://127.0.0.1:8080,http://localhost:8080,http://127.0.0.1:5173
+    volumes:
+      - ../contracts/fixtures:/app/reference:ro
+      - ../contracts/examples:/app/reference-examples:ro
+      - ../config:/app/config:ro
     depends_on:
       db:
         condition: service_healthy
@@ -46,13 +61,20 @@ services:
       dockerfile: infra/backend.Dockerfile
     command: ["python", "-m", "apps.worker.main"]
     environment:
-      WORKER_ENABLED: "false"
+      WORKER_ENABLED: "true"
+      OBSERVATIONS_DIR: /app/data/observations
       DB_HOST: db
       DB_PORT: "5432"
       DB_NAME: energy_diagnostics
       DB_USER: energy_diagnostics
       DB_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in infra/.env}
+      API_REFERENCE_FIXTURE_PATH: /app/reference/reference-snapshot.json
+      API_REFERENCE_EXAMPLES_DIR: /app/reference-examples
+      DIAGNOSTIC_POLICY_PATH: /app/config/diagnostic-policy.demo.json
     volumes:
+      - ../contracts/fixtures:/app/reference:ro
+      - ../contracts/examples:/app/reference-examples:ro
+      - ../config:/app/config:ro
       - type: bind
         source: ../data/observations
         target: /app/data/observations

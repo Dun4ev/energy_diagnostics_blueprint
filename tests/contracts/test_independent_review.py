@@ -140,17 +140,13 @@ def test_measurement_event_cannot_follow_receipt():
         m.Measurement.model_validate(data)
 
 
-def test_served_openapi_matches_frozen_export_and_marks_stubs():
+def test_served_openapi_matches_frozen_export_and_marks_implementation():
     exported = fixture("contracts/openapi.json")
     with TestClient(app) as client:
         served = client.get("/openapi.json")
         assert served.status_code == 200
         assert served.json() == exported
-        response = client.get("/api/v1/risks?scenarioRunId=reference-slide29")
-        assert response.status_code == 501
     for path, operations in exported["paths"].items():
         for operation in operations.values():
             if isinstance(operation, dict):
-                assert operation["x-implementation-status"] == (
-                    "implemented" if path == "/api/v1/health" else "stub"
-                )
+                assert operation["x-implementation-status"] == "implemented"

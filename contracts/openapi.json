@@ -7567,7 +7567,7 @@
           }
         ],
         "summary": "Scenarios",
-        "x-implementation-status": "stub"
+        "x-implementation-status": "implemented"
       }
     },
     "/api/v1/demo/sessions": {
@@ -7685,7 +7685,7 @@
           }
         ],
         "summary": "Create Session",
-        "x-implementation-status": "stub"
+        "x-implementation-status": "implemented"
       }
     },
     "/api/v1/demo/sessions/{id}": {
@@ -7907,7 +7907,7 @@
           }
         ],
         "summary": "Advance",
-        "x-implementation-status": "stub"
+        "x-implementation-status": "implemented"
       }
     },
     "/api/v1/evidence": {
