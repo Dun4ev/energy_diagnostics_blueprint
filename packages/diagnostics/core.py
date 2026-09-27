@@ -429,25 +429,25 @@ class DeterministicAnalyzer:
         )
 
     def _persistence(self, points: list[SeriesPoint], threshold: float, as_of: datetime) -> float:
-        eligible = [p for p in points if p.residualC is not None and p.eventTime <= as_of]
-        if not eligible or eligible[-1].residualC < threshold:
+        eligible = [p for p in points if p.eventTime <= as_of]
+        if not eligible or eligible[-1].residualC is None or eligible[-1].quality != "good" or eligible[-1].residualC < threshold:
             return 0.0
         end = eligible[-1].eventTime
         start = end
         for point in reversed(eligible[:-1]):
-            if point.residualC < threshold or (start - point.eventTime).total_seconds() > SYNC_SECONDS:
+            if point.residualC is None or point.quality != "good" or point.residualC < threshold or (start - point.eventTime).total_seconds() > SYNC_SECONDS:
                 break
             start = point.eventTime
         return (end - start).total_seconds() / 60
 
     def _persistence_below(self, points: list[SeriesPoint], threshold: float, as_of: datetime) -> float:
-        eligible = [p for p in points if p.residualC is not None and p.eventTime <= as_of]
-        if not eligible or eligible[-1].residualC >= threshold:
+        eligible = [p for p in points if p.eventTime <= as_of]
+        if not eligible or eligible[-1].residualC is None or eligible[-1].quality != "good" or eligible[-1].residualC >= threshold:
             return 0.0
         end = eligible[-1].eventTime
         start = end
         for point in reversed(eligible[:-1]):
-            if point.residualC >= threshold or (start - point.eventTime).total_seconds() > SYNC_SECONDS:
+            if point.residualC is None or point.quality != "good" or point.residualC >= threshold or (start - point.eventTime).total_seconds() > SYNC_SECONDS:
                 break
             start = point.eventTime
         return (end - start).total_seconds() / 60
