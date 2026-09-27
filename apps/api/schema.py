@@ -18,11 +18,16 @@ def complete_openapi(openapi):
     openapi["components"]["securitySchemes"] = {
         "demoSession": {"type": "apiKey", "in": "cookie", "name": "energy_session"}
     }
+    pending = {
+        "/api/v1/demo/scenarios",
+        "/api/v1/demo/sessions",
+        "/api/v1/demo/sessions/{id}/advance",
+    }
     for path, methods in openapi["paths"].items():
         for op in methods.values():
             if not isinstance(op, dict):
                 continue
-            op["x-implementation-status"] = "implemented" if path.endswith("/health") else "stub"
+            op["x-implementation-status"] = "stub" if path in pending else "implemented"
             if path not in {"/api/v1/health", "/api/v1/auth/login"}:
                 op["security"] = [{"demoSession": []}]
     return openapi
