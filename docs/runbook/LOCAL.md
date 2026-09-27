@@ -1,68 +1,70 @@
-# Локальный каркас: этап01
+# Локальный запуск prototype
 
-Это запускаемый фундамент, не диагностика. Только health выполняет реальную проверку БД. Остальные API возвращают 501; auth, persistence business models, replay, numerical core и три рабочих экрана появятся на этапах02–07. Никакие кнопки согласования не симулируются.
+Runbook относится к интегрированному локальному стеку Energy Diagnostics. Runtime использует синтетические observations и reference fixture, сохраняет runs/workflow в PostgreSQL и показывает UI на `http://127.0.0.1:8080`. Это advisory prototype: внешняя AI выключена, подключений к полевым устройствам и команд управления нет.
 
-## Окружение
+## Первичная настройка
 
-Node25.1.0 / npm11.13.0, Python3.13.5 / uv0.12.15; точные зависимости в package-lock.json и uv.lock. Docker daemon должен отвечать. Все команды из корня проекта. Глобальные настройки не менять.
+Все команды Compose выполняйте из основного checkout проекта, где находится его `infra/.env`. Для этой машины основной checkout: `/Users/j15/Documents/Code_and_Scripts_local/prototypes/energy_diagnostics_blueprint`. Не запускайте Compose с таким же именем проекта из worktree: bind mounts укажут на другой checkout.
+
+Один раз сгенерируйте отсутствующие локальные пароли:
 
 ```bash
-uv sync --frozen
-npm ci
-npm run lint
-npm run contracts:check
-uv run --frozen pytest tests/contracts
-npm test
-npm run build
+python scripts/init_local_env.py
 ```
 
-Для первого запуска нужен локальный `infra/.env` (игнорируется Git). Создать один раз, не перезаписывать существующий пароль:
+Скрипт добавляет только отсутствующие ключи в `infra/.env`, устанавливает права `0600` и не показывает значения. Не коммитьте и не копируйте этот файл в worktree. Demo usernames: `engineer`, `approver`, `technician`, `viewer`, `admin`; пароли остаются в локальном `infra/.env`.
+
+Проверьте Compose без вывода раскрытых переменных и запустите сервисы:
 
 ```bash
-python3 - <<'PY'
-from pathlib import Path
-import os, secrets
-p = Path('infra/.env')
-fd = os.open(p, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
-with os.fdopen(fd, 'w') as stream:
-    stream.write('POSTGRES_PASSWORD=' + secrets.token_urlsafe(32) + '\n')
-PY
-
 docker compose --env-file infra/.env -p energy-diagnostics -f infra/compose.yaml config --quiet
 docker compose --env-file infra/.env -p energy-diagnostics -f infra/compose.yaml up --build -d --wait
-curl --fail http://127.0.0.1:8080/api/v1/health
+docker compose --env-file infra/.env -p energy-diagnostics -f infra/compose.yaml ps
+curl --fail --silent --show-error http://127.0.0.1:8080/api/v1/health
 ```
 
-Открыть http://127.0.0.1:8080. Единственный опубликованный порт привязан к loopback; API/БД/worker внутренние. Worker пока только ожидает остановки, не создает AnalysisRun. observations примонтированы ему read-only; truth отсутствует в образах и mounts. `docker compose config` без --quiet может напечатать пароль, не использовать в отчетах.
+Ожидаемый health: база `ready`, business runtime `ready`, `advisoryOnly=true`, `controlCommandsAllowed=false`, `externalAiEnabled=false`. Публикуется только web port на loopback; база, API и worker остаются внутри Compose network. Worker получает `data/observations` в read-only mount; `data/truth/` не монтируется.
 
-Остановка с сохранением базы:
+## Работа с данными и workflow
+
+Откройте `http://127.0.0.1:8080`, войдите под одной из локальных demo-ролей и выберите REFERENCE или SIMULATION. Reference показывает illustrative snapshot. Simulation создает новый `scenarioRunId`, а worker рассчитывает доступный срез из observation fixtures и сохраняет результаты.
+
+Reset означает создать новый run. Старый run и его evidence/workflow остаются в базе; endpoint для очистки данных или переиспользования того же run отсутствует. В API мутации используют серверную роль, CSRF и idempotency key; изменения состояния проверяют ожидаемую revision. Подтверждение случая и закрытие требуют отдельных человеческих действий и evidence.
+
+Проверить сервисы можно командами `ps` и health выше. Не публикуйте вывод `docker compose config` без `--quiet`: он может содержать значения из env-файла.
+
+## Остановка и повторный запуск
+
+Остановите контейнеры с сохранением named volume PostgreSQL:
 
 ```bash
 docker compose --env-file infra/.env -p energy-diagnostics -f infra/compose.yaml stop
 ```
 
-Повторный запуск той же командой up. Не удалять volumes и не менять DB пароль поверх существующего volume. Reset/backup/restore бизнес-данных будут добавлены и проверены на этапе07, пока такой функции нет.
+Повторный запуск используйте командой `up --build -d --wait` из основного checkout. Не добавляйте `-v`, не выполняйте `down -v` и не удаляйте `postgres-data`: эти действия уничтожают локальное состояние.
 
-## Контракты и mocks
+## Backup и безопасная проверка restore
 
-Канон packages/domain_contracts. После согласованного RFC:
-
-```bash
-npm run contracts:generate
-npm run contracts:check
-```
-
-mocks.ts не импортируется production entry. Он предназначен для tests и будущего отдельного UI harness. Generated API types и openapi-fetch служат typed service interface; контекст run передается явно. Изменения schemas/locks делает интегратор.
-
-Численные допуски: contracts/NUMERICAL_ACCEPTANCE.md. Решения по ревизиям, auth, evidence, unsupported: handoffs/RFC-foundation-contracts.md. Source fixtures в contracts/examples не являются живыми API responses.
-
-## Browser smoke
-
-Проектный @playwright/test закреплен. Если Chromium еще не доступен, его установка является проектным QA prerequisite:
+Сделайте backup запущенной локальной базы из основного checkout:
 
 ```bash
-PLAYWRIGHT_SKIP_BROWSER_GC=1 npx --no-install playwright install chromium
-npm run test:e2e
+python scripts/backup_local.py
 ```
 
-Playwright MCP можно использовать для ручного просмотра. Smoke проверяет только каркас/health/501, не workflow или численную правильность.
+Скрипт находит контейнер БД по Compose labels и вызывает `pg_dump` внутри него, не читает `.env` и не выводит пароль. Custom-format архив создается с правами `0600` в `infra/.env.backups/` с правами папки `0700`. Путь проверяется через `git check-ignore`, архив проверяется командой `pg_restore --list`, затем печатаются размер и SHA-256. Папка игнорируется Git.
+
+Проверьте backup, передав его путь:
+
+```bash
+python scripts/verify_restore.py infra/.env.backups/ИМЯ_АРХИВА.dump
+```
+
+Проверка создает новую уникально названную database в текущем PostgreSQL cluster/named volume, восстанавливает туда архив без `--clean`, `--create` или удаления объектов и проверяет таблицы и counts. Исходная БД не изменяется; volume теперь дополнительно содержит изолированную restore database. Тестовая база сохраняется. Скрипт никогда не удаляет restore target, в том числе при ошибке. Перед повторной проверкой используйте новый backup/target; удаление тестовой БД требует отдельного ручного решения после проверки ее имени и содержимого.
+
+Локальный dump содержит пользовательские workflow и synthetic данные. Храните его в этой ignored папке с ограниченными правами и не отправляйте в Git или внешнее хранилище без отдельной оценки доступа. Успешный локальный restore подтверждает только читаемость данного архива и восстановление в этой локальной среде, не промышленную отказоустойчивость.
+
+## API и ограничения
+
+OpenAPI доступна через `/api/v1/openapi.json`. Основные read endpoints: `/api/v1/risks`, `/api/v1/cases`, `/api/v1/cases/{caseId}/snapshot`, `/api/v1/work-plans`, `/api/v1/assets`, `/api/v1/sources`, `/api/v1/demo/scenarios`. Для создания Simulation используется `/api/v1/demo/sessions`; advance привязан к run и требует разрешения demo-оператора.
+
+Все видимые значения маркируются режимом данных и виртуальным временем. История immutable по run, replay будущего времени не меняет ранее сохраненные AnalysisRun. Нет telemetry в реальном времени, command endpoint, автоматического подтверждения дефекта или внешнего AI. Synthetic проверки не заменяют field validation.
