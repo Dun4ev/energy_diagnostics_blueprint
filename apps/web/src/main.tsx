@@ -4,6 +4,7 @@ import { api } from './api/client';
 import { applyTokens, brand } from './config';
 import { featureRegistrations } from './features';
 import './style.css';
+import { Gallery } from './shell/Gallery';
 
 function Foundation() {
   const [status, setStatus] = useState('Проверка связи с backend...');
@@ -24,4 +25,4 @@ function Foundation() {
 }
 applyTokens();
 document.title = brand.productName;
-createRoot(document.getElementById('root')!).render(<StrictMode><Foundation /></StrictMode>);
+createRoot(document.getElementById('root')!).render(<StrictMode>{window.location.pathname === '/gallery' ? <Gallery /> : <Foundation />}</StrictMode>);
