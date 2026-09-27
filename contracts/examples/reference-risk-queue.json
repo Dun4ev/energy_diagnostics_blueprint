@@ -1,0 +1,46 @@
+{
+  "origin": "presentation_illustration",
+  "asOf": "2026-07-24T07:42:00Z",
+  "rows": [
+    {
+      "assetId": "tp177-t1",
+      "assetLabel": "ТП-177 / Т-1",
+      "caseId": "AG-2026-017",
+      "analysisRunId": "reference-ag-2026-017-r1",
+      "signal": "Аномальный нагрев",
+      "value": "ΔT +12 °C; нагрузка 74%",
+      "priority": "high",
+      "nextStep": "Осмотр ≤48 ч"
+    },
+    {
+      "assetId": "rp4-breaker",
+      "assetLabel": "РП-4 / выключатель",
+      "caseId": null,
+      "analysisRunId": null,
+      "signal": "Изменение времени включения",
+      "value": "+180 мс за последние 7 дней",
+      "priority": "medium",
+      "nextStep": "Проверить привод"
+    },
+    {
+      "assetId": "kl10-section",
+      "assetLabel": "КЛ-10 кВ / участок",
+      "caseId": null,
+      "analysisRunId": null,
+      "signal": "Частичные разряды",
+      "value": "УРЧ 12 дБ за 24 ч — термин и метод требуют уточнения",
+      "priority": "medium",
+      "nextStep": "Подтвердить измерение"
+    },
+    {
+      "assetId": "tp204-t2",
+      "assetLabel": "ТП-204 / Т-2",
+      "caseId": null,
+      "analysisRunId": null,
+      "signal": "Стабильный режим",
+      "value": "Нагрузка 62%",
+      "priority": "low",
+      "nextStep": "Наблюдать"
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+[
+  {
+    "assetId": "tp177-t1",
+    "name": "ТП-177 / Т-1",
+    "assetType": "transformer",
+    "siteId": "demo-site",
+    "voltageLabel": "10/0.4 kV",
+    "measurementLocation": "synthetic phase A contact; not a real installed sensor",
+    "demoConsequenceWeight": 0.8,
+    "thermalCalibration": {
+      "aC": 4,
+      "bC": 60,
+      "tauHours": 2
+    },
+    "origin": "synthetic"
+  },
+  {
+    "assetId": "tp204-t2",
+    "name": "ТП-204 / Т-2",
+    "assetType": "transformer",
+    "siteId": "demo-site",
+    "voltageLabel": "10/0.4 kV",
+    "measurementLocation": "synthetic phase A contact; not a real installed sensor",
+    "demoConsequenceWeight": 0.4,
+    "thermalCalibration": {
+      "aC": 4,
+      "bC": 60,
+      "tauHours": 2
+    },
+    "origin": "synthetic"
+  },
+  {
+    "assetId": "tp305-t1",
+    "name": "ТП-305 / Т-1",
+    "assetType": "transformer",
+    "siteId": "demo-site",
+    "voltageLabel": "10/0.4 kV",
+    "measurementLocation": "synthetic phase A contact; not a real installed sensor",
+    "demoConsequenceWeight": 0.6,
+    "thermalCalibration": {
+      "aC": 4,
+      "bC": 60,
+      "tauHours": 2
+    },
+    "origin": "synthetic"
+  },
+  {
+    "assetId": "tp306-t1",
+    "name": "ТП-306 / Т-1",
+    "assetType": "transformer",
+    "siteId": "demo-site",
+    "voltageLabel": "10/0.4 kV",
+    "measurementLocation": "synthetic phase A contact; not a real installed sensor",
+    "demoConsequenceWeight": 0.6,
+    "thermalCalibration": {
+      "aC": 4,
+      "bC": 60,
+      "tauHours": 2
+    },
+    "origin": "synthetic"
+  },
+  {
+    "assetId": "tp307-t1",
+    "name": "ТП-307 / Т-1",
+    "assetType": "transformer",
+    "siteId": "demo-site",
+    "voltageLabel": "10/0.4 kV",
+    "measurementLocation": "synthetic phase A contact; not a real installed sensor",
+    "demoConsequenceWeight": 0.5,
+    "thermalCalibration": {
+      "aC": 4,
+      "bC": 60,
+      "tauHours": 2
+    },
+    "origin": "synthetic"
+  },
+  {
+    "assetId": "tp308-t1",
+    "name": "ТП-308 / Т-1",
+    "assetType": "transformer",
+    "siteId": "demo-site",
+    "voltageLabel": "10/0.4 kV",
+    "measurementLocation": "synthetic phase A contact; not a real installed sensor",
+    "demoConsequenceWeight": 0.7,
+    "thermalCalibration": {
+      "aC": 4,
+      "bC": 60,
+      "tauHours": 2
+    },
+    "origin": "synthetic"
+  },
+  {
+    "assetId": "tp309-t1",
+    "name": "ТП-309 / Т-1",
+    "assetType": "transformer",
+    "siteId": "demo-site",
+    "voltageLabel": "10/0.4 kV",
+    "measurementLocation": "synthetic phase A contact; not a real installed sensor",
+    "demoConsequenceWeight": 0.8,
+    "thermalCalibration": {
+      "aC": 4,
+      "bC": 60,
+      "tauHours": 2
+    },
+    "origin": "synthetic"
+  },
+  {
+    "assetId": "rp4-breaker",
+    "name": "РП-4 / выключатель",
+    "assetType": "breaker",
+    "siteId": "demo-site",
+    "origin": "synthetic"
+  },
+  {
+    "assetId": "kl10-section",
+    "name": "КЛ-10 кВ / участок",
+    "assetType": "cable",
+    "siteId": "demo-site",
+    "origin": "synthetic"
+  }
+]

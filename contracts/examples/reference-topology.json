@@ -1,0 +1,46 @@
+{
+  "origin": "presentation_illustration",
+  "stateSource": "model",
+  "confirmed": false,
+  "nodes": [
+    {
+      "id": "ps-zagorodnaya",
+      "label": "ПС «Загородная» 110/10 кВ",
+      "type": "substation",
+      "state": "energized"
+    },
+    {
+      "id": "tp177-bus",
+      "label": "ТП-177, шина 10 кВ",
+      "type": "bus",
+      "state": "energized"
+    },
+    {
+      "id": "tp177-t1",
+      "label": "Т-1",
+      "type": "transformer",
+      "state": "energized"
+    },
+    {
+      "id": "tp177-t2",
+      "label": "Т-2",
+      "type": "transformer",
+      "state": "unknown"
+    }
+  ],
+  "edges": [
+    {
+      "from": "ps-zagorodnaya",
+      "to": "tp177-bus"
+    },
+    {
+      "from": "tp177-bus",
+      "to": "tp177-t1"
+    },
+    {
+      "from": "tp177-bus",
+      "to": "tp177-t2"
+    }
+  ],
+  "note": "Состояние Т-2 не установлено: серый рисунок не интерпретировать как доказанное отключение."
+}

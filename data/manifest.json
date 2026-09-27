@@ -1,0 +1,62 @@
+{
+  "generatorVersion": "demo-generator-0.1.0",
+  "seed": 20260925,
+  "origin": "synthetic",
+  "notFieldValidated": true,
+  "start": "2026-06-24T07:40:00Z",
+  "end": "2026-07-24T07:40:00Z",
+  "stepSeconds": 300,
+  "days": 30,
+  "assetCount": 9,
+  "transformerCount": 7,
+  "transformerWideRows": 60487,
+  "hiddenHourlyRows": 5047,
+  "breakerEventCount": 31,
+  "cableSampleCount": 31,
+  "files": {
+    "observations/assets.json": {
+      "sha256": "4902e74b44d80578dea9a05e7c71c1c48ca072e1bdc35b3a6eda97fe2cf11e01",
+      "bytes": 3064
+    },
+    "observations/breaker_events.json": {
+      "sha256": "8f01c04555f3ff860cb5533cbad8d046d87dd2665b6860a139fa8fde9cde2579",
+      "bytes": 6486
+    },
+    "observations/cable_daily_measurements.json": {
+      "sha256": "f7cf84fccd6cbf08aaa1558f690abf72e618cfa9f371b4fa3643282e693258cd",
+      "bytes": 7786
+    },
+    "observations/evidence.json": {
+      "sha256": "c009dda8fb79ac837575a3b3a462b7837b6eb6448566469ba29020b0d86109d9",
+      "bytes": 899
+    },
+    "observations/normalized_measurement_examples.json": {
+      "sha256": "a21e5e74534c854d227dda40fb2882e20bca2ed3e990e2ff1df7cfed73892da7",
+      "bytes": 11912
+    },
+    "observations/transformer_readings.csv.gz": {
+      "sha256": "1622c17c9898d62ecf3b323673ea65308e9fc361c550cf6459150e9a7734020d",
+      "bytes": 1696562
+    },
+    "observations/transport_fault_examples.jsonl": {
+      "sha256": "c1946a036346456538079a2096f456250c1bc698add18a02927d62e9056e5b20",
+      "bytes": 10525
+    },
+    "truth/final_observations_for_validation.json": {
+      "sha256": "ba95b4a987d3d38c3fcb16926e6b08315cbabdf059a6d5077d25302df2387910",
+      "bytes": 2755
+    },
+    "truth/hidden_hourly_state.csv.gz": {
+      "sha256": "d3b985584c1ec80de3a321b59e7c491126b07f21cbc285fa156dfb709b002883",
+      "bytes": 53099
+    },
+    "truth/scenario_labels.json": {
+      "sha256": "014444489d515a394c362f6ee35ce1f911a5fa7ed6951077f2f25d92c752c6bc",
+      "bytes": 1017
+    },
+    "truth/transport_expectations.json": {
+      "sha256": "7e1e2066d8e7904bbe32ab48a396010688deab81473c8490b92e2e2eaa2030c8",
+      "bytes": 108
+    }
+  }
+}

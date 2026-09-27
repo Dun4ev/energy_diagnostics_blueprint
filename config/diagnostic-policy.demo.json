@@ -1,0 +1,62 @@
+{
+  "version": "demo-policy-0.1.0",
+  "applicability": "SYNTHETIC CONTACT TEMPERATURE ONLY; NOT OEM OR RELAY SETTINGS",
+  "thermalModel": {
+    "aC": 4.0,
+    "bC": 60.0,
+    "tauHours": 2.0
+  },
+  "quality": {
+    "maxTelemetryAgeSeconds": 600,
+    "minimumWindowCoverage": 0.8,
+    "minimumTrendHours": 24,
+    "minimumHourlyBins": 20,
+    "thermographyMaxAgeHoursForThisHeatCaseOnly": 48
+  },
+  "trend": {
+    "aggregation": "hourly_median",
+    "estimator": "theil_sen",
+    "windowsHours": [
+      24,
+      72
+    ]
+  },
+  "detection": {
+    "residualWatchC": 5.0,
+    "persistMinutes": 60,
+    "clearResidualC": 3.0,
+    "clearPersistMinutes": 180,
+    "autoCloseCase": false
+  },
+  "priority": {
+    "severityScaleC": 20,
+    "growthScaleCPerDay": 3,
+    "weights": {
+      "severity": 0.5,
+      "growth": 0.3,
+      "consequence": 0.2
+    },
+    "mediumFrom": 3,
+    "highFrom": 6,
+    "insufficientDataScore": null,
+    "qualityMustNotReduceRiskToZero": true
+  },
+  "conditionalForecast": {
+    "enabled": false,
+    "demoResidualThresholdC": 20,
+    "maximumHorizonDays": 7,
+    "label": "Условная экстраполяция, не прогноз отказа"
+  },
+  "failureProbability": null,
+  "allowAutoApprove": false,
+  "allowOperationalCommands": false,
+  "allowedActionCodes": [
+    "VERIFY_TELEMETRY",
+    "REQUEST_THERMOGRAPHY",
+    "COMPARE_PHASES_AND_LOAD",
+    "ENGINEERING_REVIEW",
+    "PLAN_MAINTENANCE_IF_CONFIRMED",
+    "VERIFY_AFTER_ACTION",
+    "CONTINUE_OBSERVATION"
+  ]
+}

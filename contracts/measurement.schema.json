@@ -1,0 +1,221 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "measurement v0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": "0.1.0"
+    },
+    "measurementId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "assetId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourceId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "metric": {
+      "enum": [
+        "contact_temperature",
+        "ambient_temperature",
+        "load_fraction",
+        "closing_time",
+        "relative_pd_indicator"
+      ]
+    },
+    "eventTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "receivedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "value": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "unit": {
+      "enum": [
+        "degC",
+        "fraction",
+        "ms",
+        "dB_ref_demo"
+      ]
+    },
+    "quality": {
+      "enum": [
+        "good",
+        "missing",
+        "suspect",
+        "invalid"
+      ]
+    },
+    "origin": {
+      "enum": [
+        "synthetic",
+        "field"
+      ]
+    },
+    "scenarioRunId": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "measurementId",
+    "assetId",
+    "sourceId",
+    "metric",
+    "eventTime",
+    "receivedAt",
+    "value",
+    "unit",
+    "quality",
+    "origin",
+    "scenarioRunId"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "quality": {
+            "const": "missing"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "value": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "quality": {
+            "const": "good"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "value": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "metric": {
+            "const": "contact_temperature"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "unit": {
+            "const": "degC"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "metric": {
+            "const": "ambient_temperature"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "unit": {
+            "const": "degC"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "metric": {
+            "const": "load_fraction"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "unit": {
+            "const": "fraction"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "metric": {
+            "const": "closing_time"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "unit": {
+            "const": "ms"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "metric": {
+            "const": "relative_pd_indicator"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "unit": {
+            "const": "dB_ref_demo"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "metric": {
+            "const": "load_fraction"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "value": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 2
+          }
+        }
+      }
+    }
+  ]
+}

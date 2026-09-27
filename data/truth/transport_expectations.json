@@ -1,0 +1,6 @@
+{
+  "inputPackets": 33,
+  "uniqueMeasurementIds": 30,
+  "duplicatePackets": 3,
+  "latePacketsExist": true
+}

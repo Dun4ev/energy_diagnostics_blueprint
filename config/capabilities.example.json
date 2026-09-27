@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "0.1.0",
+  "dataModes": [
+    "reference",
+    "simulation"
+  ],
+  "defaultMode": "simulation",
+  "modules": [
+    {
+      "id": "assets",
+      "route": "/assets",
+      "label": "Обзор активов",
+      "enabled": true
+    },
+    {
+      "id": "diagnostics",
+      "route": "/diagnostics",
+      "label": "Диагностика",
+      "enabled": true
+    },
+    {
+      "id": "risks",
+      "route": "/risks",
+      "label": "Очередь рисков",
+      "enabled": true
+    },
+    {
+      "id": "defects",
+      "route": "/defects",
+      "label": "Дефекты",
+      "enabled": true
+    },
+    {
+      "id": "workPlans",
+      "route": "/work-plans",
+      "label": "Задания ТОиР",
+      "enabled": true
+    },
+    {
+      "id": "models",
+      "route": "/models-and-data",
+      "label": "Модели и данные",
+      "enabled": true
+    },
+    {
+      "id": "reports",
+      "route": "/reports",
+      "label": "Отчёты",
+      "enabled": true
+    }
+  ]
+}

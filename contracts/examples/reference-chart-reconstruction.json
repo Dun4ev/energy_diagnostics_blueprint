@@ -1,0 +1,111 @@
+{
+  "origin": "presentation_illustration",
+  "warning": "Стилизованная реконструкция: не точная оцифровка, не исходная телеметрия. Полоса ±3 °C выбрана только для визуального макета; не статистический интервал.",
+  "points": [
+    {
+      "eventTime": "2026-07-10T07:42:00Z",
+      "expectedC": 51.0,
+      "observedC": 55.0,
+      "illustrativeBandLowC": 48.0,
+      "illustrativeBandHighC": 54.0
+    },
+    {
+      "eventTime": "2026-07-11T07:42:00Z",
+      "expectedC": 52.91,
+      "observedC": 57.48,
+      "illustrativeBandLowC": 49.91,
+      "illustrativeBandHighC": 55.91
+    },
+    {
+      "eventTime": "2026-07-12T07:42:00Z",
+      "expectedC": 53.53,
+      "observedC": 58.67,
+      "illustrativeBandLowC": 50.53,
+      "illustrativeBandHighC": 56.53
+    },
+    {
+      "eventTime": "2026-07-13T07:42:00Z",
+      "expectedC": 53.96,
+      "observedC": 59.67,
+      "illustrativeBandLowC": 50.96,
+      "illustrativeBandHighC": 56.96
+    },
+    {
+      "eventTime": "2026-07-14T07:42:00Z",
+      "expectedC": 55.66,
+      "observedC": 61.95,
+      "illustrativeBandLowC": 52.66,
+      "illustrativeBandHighC": 58.66
+    },
+    {
+      "eventTime": "2026-07-15T07:42:00Z",
+      "expectedC": 57.73,
+      "observedC": 64.59,
+      "illustrativeBandLowC": 54.73,
+      "illustrativeBandHighC": 60.73
+    },
+    {
+      "eventTime": "2026-07-16T07:42:00Z",
+      "expectedC": 58.57,
+      "observedC": 66.0,
+      "illustrativeBandLowC": 55.57,
+      "illustrativeBandHighC": 61.57
+    },
+    {
+      "eventTime": "2026-07-17T07:42:00Z",
+      "expectedC": 58.88,
+      "observedC": 66.88,
+      "illustrativeBandLowC": 55.88,
+      "illustrativeBandHighC": 61.88
+    },
+    {
+      "eventTime": "2026-07-18T07:42:00Z",
+      "expectedC": 60.34,
+      "observedC": 68.91,
+      "illustrativeBandLowC": 57.34,
+      "illustrativeBandHighC": 63.34
+    },
+    {
+      "eventTime": "2026-07-19T07:42:00Z",
+      "expectedC": 62.49,
+      "observedC": 71.63,
+      "illustrativeBandLowC": 59.49,
+      "illustrativeBandHighC": 65.49
+    },
+    {
+      "eventTime": "2026-07-20T07:42:00Z",
+      "expectedC": 63.6,
+      "observedC": 73.31,
+      "illustrativeBandLowC": 60.6,
+      "illustrativeBandHighC": 66.6
+    },
+    {
+      "eventTime": "2026-07-21T07:42:00Z",
+      "expectedC": 63.86,
+      "observedC": 74.14,
+      "illustrativeBandLowC": 60.86,
+      "illustrativeBandHighC": 66.86
+    },
+    {
+      "eventTime": "2026-07-22T07:42:00Z",
+      "expectedC": 65.05,
+      "observedC": 75.9,
+      "illustrativeBandLowC": 62.05,
+      "illustrativeBandHighC": 68.05
+    },
+    {
+      "eventTime": "2026-07-23T07:42:00Z",
+      "expectedC": 67.21,
+      "observedC": 78.64,
+      "illustrativeBandLowC": 64.21,
+      "illustrativeBandHighC": 70.21
+    },
+    {
+      "eventTime": "2026-07-24T07:42:00Z",
+      "expectedC": 68.0,
+      "observedC": 80.0,
+      "illustrativeBandLowC": 65.0,
+      "illustrativeBandHighC": 71.0
+    }
+  ]
+}

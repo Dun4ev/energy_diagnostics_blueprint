@@ -1,0 +1,97 @@
+{
+  "scope": "Blueprint files, schema examples, design token contrast and synthetic generator only. NOT application/field validation.",
+  "checkedAt": "2026-09-25T11:57:31.265163+00:00",
+  "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+  "jsonschema": "4.26.0",
+  "testsRun": 19,
+  "failures": 0,
+  "errors": 0,
+  "passed": true,
+  "checks": [
+    {
+      "name": "test_01_manifest_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_02_seed_reproducibility",
+      "status": "passed"
+    },
+    {
+      "name": "test_03_different_seed_changes_observations",
+      "status": "passed"
+    },
+    {
+      "name": "test_04_refuses_nonempty_destination",
+      "status": "passed"
+    },
+    {
+      "name": "test_05_counts_and_timestamps",
+      "status": "passed"
+    },
+    {
+      "name": "test_06_no_hidden_truth_columns_in_observations",
+      "status": "passed"
+    },
+    {
+      "name": "test_07_progressive_heat_and_drift_are_different",
+      "status": "passed"
+    },
+    {
+      "name": "test_08_load_step_does_not_inject_true_heat",
+      "status": "passed"
+    },
+    {
+      "name": "test_09_quality_faults_are_present",
+      "status": "passed"
+    },
+    {
+      "name": "test_10_recovery_and_acceleration",
+      "status": "passed"
+    },
+    {
+      "name": "test_11_transport_dedup_fixture",
+      "status": "passed"
+    },
+    {
+      "name": "test_12_event_sources_are_not_continuous_transformer_data",
+      "status": "passed"
+    },
+    {
+      "name": "test_13_reference_is_illustration_not_probability",
+      "status": "passed"
+    },
+    {
+      "name": "test_14_schema_examples_validate",
+      "status": "passed"
+    },
+    {
+      "name": "test_15_schema_rejects_invalid_semantics",
+      "status": "passed"
+    },
+    {
+      "name": "test_16_token_contrast",
+      "status": "passed"
+    },
+    {
+      "name": "test_17_advisory_config",
+      "status": "passed"
+    },
+    {
+      "name": "test_18_no_fake_thermographic_evidence",
+      "status": "passed"
+    },
+    {
+      "name": "test_19_prompts_and_required_handoff_files",
+      "status": "passed"
+    }
+  ],
+  "notImplementedOrTested": [
+    "frontend",
+    "API/backend",
+    "workflow/RBAC runtime",
+    "diagnostic algorithm implementation",
+    "real equipment integration",
+    "Jev API calls",
+    "industrial safety or calibration"
+  ]
+}

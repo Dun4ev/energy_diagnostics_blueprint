@@ -1,0 +1,281 @@
+[
+  {
+    "eventId": "breaker-000",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-06-24T07:40:00Z",
+    "closingTimeMs": 69.938,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-001",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-06-25T07:40:00Z",
+    "closingTimeMs": 71.028,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-002",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-06-26T07:40:00Z",
+    "closingTimeMs": 72.041,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-003",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-06-27T07:40:00Z",
+    "closingTimeMs": 69.255,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-004",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-06-28T07:40:00Z",
+    "closingTimeMs": 70.303,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-005",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-06-29T07:40:00Z",
+    "closingTimeMs": 69.048,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-006",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-06-30T07:40:00Z",
+    "closingTimeMs": 70.227,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-007",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-07-01T07:40:00Z",
+    "closingTimeMs": 68.476,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-008",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-07-02T07:40:00Z",
+    "closingTimeMs": 71.737,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-009",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-07-03T07:40:00Z",
+    "closingTimeMs": 72.715,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-010",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-07-04T07:40:00Z",
+    "closingTimeMs": 69.437,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-011",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-07-05T07:40:00Z",
+    "closingTimeMs": 69.656,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-012",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-07-06T07:40:00Z",
+    "closingTimeMs": 68.44,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-013",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-07-07T07:40:00Z",
+    "closingTimeMs": 74.544,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-014",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-07-08T07:40:00Z",
+    "closingTimeMs": 70.014,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-015",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-07-09T07:40:00Z",
+    "closingTimeMs": 67.896,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-016",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-07-10T07:40:00Z",
+    "closingTimeMs": 71.473,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-017",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-07-11T07:40:00Z",
+    "closingTimeMs": 68.512,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-018",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-07-12T07:40:00Z",
+    "closingTimeMs": 69.409,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-019",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-07-13T07:40:00Z",
+    "closingTimeMs": 68.898,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-020",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-07-14T07:40:00Z",
+    "closingTimeMs": 71.938,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-021",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-07-15T07:40:00Z",
+    "closingTimeMs": 67.981,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-022",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-07-16T07:40:00Z",
+    "closingTimeMs": 70.924,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-023",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-07-17T07:40:00Z",
+    "closingTimeMs": 64.739,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-024",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-07-18T07:40:00Z",
+    "closingTimeMs": 95.283,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-025",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-07-19T07:40:00Z",
+    "closingTimeMs": 121.459,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-026",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-07-20T07:40:00Z",
+    "closingTimeMs": 148.17,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-027",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-07-21T07:40:00Z",
+    "closingTimeMs": 172.677,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-028",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-07-22T07:40:00Z",
+    "closingTimeMs": 196.053,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-029",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-07-23T07:40:00Z",
+    "closingTimeMs": 222.575,
+    "unit": "ms",
+    "origin": "synthetic"
+  },
+  {
+    "eventId": "breaker-030",
+    "assetId": "rp4-breaker",
+    "operation": "close",
+    "eventTime": "2026-07-24T07:40:00Z",
+    "closingTimeMs": 251.743,
+    "unit": "ms",
+    "origin": "synthetic"
+  }
+]

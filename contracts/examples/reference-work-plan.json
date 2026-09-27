@@ -1,0 +1,79 @@
+{
+  "planId": "reference-plan-ag-2026-017",
+  "caseId": "AG-2026-017",
+  "analysisRunId": "reference-ag-2026-017-r1",
+  "origin": "presentation_illustration",
+  "revision": 1,
+  "sourceStatusLabel": "Ожидает согласования инженера",
+  "proposedNormalizedState": "draft",
+  "normalizationNote": "Кнопка передачи видна в источнике; draft выбран проектно, не подтверждён источником.",
+  "steps": [
+    {
+      "number": 1,
+      "actionCode": "VERIFY_TELEMETRY",
+      "description": "Проверить телеметрию и калибровку датчика температуры",
+      "assigneeRoleLabel": "Инженер диагностики",
+      "sourceDueLabel": "25.07.2026",
+      "requiredEvidenceLabels": [
+        "Журнал данных",
+        "Протокол калибровки"
+      ],
+      "status": "not_started",
+      "condition": "approved_plan"
+    },
+    {
+      "number": 2,
+      "actionCode": "REQUEST_THERMOGRAPHY",
+      "description": "Выполнить термографическое обследование",
+      "assigneeRoleLabel": "Выездная бригада",
+      "sourceDueLabel": "≤48 ч",
+      "requiredEvidenceLabels": [
+        "Термограмма",
+        "Фото",
+        "Заключение"
+      ],
+      "status": "not_started",
+      "condition": "approved_plan"
+    },
+    {
+      "number": 3,
+      "actionCode": "COMPARE_PHASES_AND_LOAD",
+      "description": "Сопоставить нагрев по фазам и с нагрузкой",
+      "assigneeRoleLabel": "Инженер диагностики",
+      "sourceDueLabel": "27.07.2026",
+      "requiredEvidenceLabels": [
+        "Графики",
+        "Сравнение фаз",
+        "Отчёт"
+      ],
+      "status": "not_started",
+      "condition": "approved_plan"
+    },
+    {
+      "number": 4,
+      "actionCode": "PLAN_MAINTENANCE_IF_CONFIRMED",
+      "description": "При подтверждении — запланировать/допустить ТОиР в установленном порядке",
+      "assigneeRoleLabel": "Ответственный за работы",
+      "sourceDueLabel": "28.07.2026",
+      "requiredEvidenceLabels": [
+        "Заявка на работы",
+        "Наряд-допуск"
+      ],
+      "status": "not_started",
+      "condition": "defect_confirmed"
+    },
+    {
+      "number": 5,
+      "actionCode": "VERIFY_AFTER_ACTION",
+      "description": "Повторить замер и закрыть случай только после проверки",
+      "assigneeRoleLabel": "Инженер диагностики",
+      "sourceDueLabel": "до 07.08.2026",
+      "requiredEvidenceLabels": [
+        "Повторные измерения",
+        "Заключение"
+      ],
+      "status": "not_started",
+      "condition": "approved_plan"
+    }
+  ]
+}

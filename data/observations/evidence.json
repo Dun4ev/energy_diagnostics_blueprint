@@ -1,0 +1,24 @@
+[
+  {
+    "evidenceId": "ev-ir-177",
+    "assetId": "tp177-t1",
+    "kind": "thermography_request_context",
+    "observedAt": "2026-07-21T07:40:00Z",
+    "origin": "synthetic",
+    "hasImage": false,
+    "uri": null,
+    "verified": false,
+    "summary": "Демонстрационная запись: реальная термограмма не приложена. Не использовать как подтверждение контактного дефекта."
+  },
+  {
+    "evidenceId": "ev-action-308",
+    "assetId": "tp308-t1",
+    "kind": "intervention_note",
+    "observedAt": "2026-07-20T07:40:00Z",
+    "origin": "synthetic",
+    "hasImage": false,
+    "uri": null,
+    "verified": false,
+    "summary": "Сценарная запись о вмешательстве; для закрытия требуются результаты контрольной проверки."
+  }
+]

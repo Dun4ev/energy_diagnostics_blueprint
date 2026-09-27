@@ -1,0 +1,281 @@
+[
+  {
+    "sampleId": "cable-000",
+    "assetId": "kl10-section",
+    "eventTime": "2026-06-24T07:40:00Z",
+    "relativePdIndicatorDb": 7.043,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-001",
+    "assetId": "kl10-section",
+    "eventTime": "2026-06-25T07:40:00Z",
+    "relativePdIndicatorDb": 6.993,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-002",
+    "assetId": "kl10-section",
+    "eventTime": "2026-06-26T07:40:00Z",
+    "relativePdIndicatorDb": 6.972,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-003",
+    "assetId": "kl10-section",
+    "eventTime": "2026-06-27T07:40:00Z",
+    "relativePdIndicatorDb": 6.842,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-004",
+    "assetId": "kl10-section",
+    "eventTime": "2026-06-28T07:40:00Z",
+    "relativePdIndicatorDb": 7.194,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-005",
+    "assetId": "kl10-section",
+    "eventTime": "2026-06-29T07:40:00Z",
+    "relativePdIndicatorDb": 7.052,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-006",
+    "assetId": "kl10-section",
+    "eventTime": "2026-06-30T07:40:00Z",
+    "relativePdIndicatorDb": 7.074,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-007",
+    "assetId": "kl10-section",
+    "eventTime": "2026-07-01T07:40:00Z",
+    "relativePdIndicatorDb": 7.087,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-008",
+    "assetId": "kl10-section",
+    "eventTime": "2026-07-02T07:40:00Z",
+    "relativePdIndicatorDb": 7.055,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-009",
+    "assetId": "kl10-section",
+    "eventTime": "2026-07-03T07:40:00Z",
+    "relativePdIndicatorDb": 6.923,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-010",
+    "assetId": "kl10-section",
+    "eventTime": "2026-07-04T07:40:00Z",
+    "relativePdIndicatorDb": 7.046,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-011",
+    "assetId": "kl10-section",
+    "eventTime": "2026-07-05T07:40:00Z",
+    "relativePdIndicatorDb": 7.05,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-012",
+    "assetId": "kl10-section",
+    "eventTime": "2026-07-06T07:40:00Z",
+    "relativePdIndicatorDb": 6.959,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-013",
+    "assetId": "kl10-section",
+    "eventTime": "2026-07-07T07:40:00Z",
+    "relativePdIndicatorDb": 6.819,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-014",
+    "assetId": "kl10-section",
+    "eventTime": "2026-07-08T07:40:00Z",
+    "relativePdIndicatorDb": 6.96,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-015",
+    "assetId": "kl10-section",
+    "eventTime": "2026-07-09T07:40:00Z",
+    "relativePdIndicatorDb": 6.908,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-016",
+    "assetId": "kl10-section",
+    "eventTime": "2026-07-10T07:40:00Z",
+    "relativePdIndicatorDb": 7.006,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-017",
+    "assetId": "kl10-section",
+    "eventTime": "2026-07-11T07:40:00Z",
+    "relativePdIndicatorDb": 7.139,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-018",
+    "assetId": "kl10-section",
+    "eventTime": "2026-07-12T07:40:00Z",
+    "relativePdIndicatorDb": 6.928,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-019",
+    "assetId": "kl10-section",
+    "eventTime": "2026-07-13T07:40:00Z",
+    "relativePdIndicatorDb": 6.975,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-020",
+    "assetId": "kl10-section",
+    "eventTime": "2026-07-14T07:40:00Z",
+    "relativePdIndicatorDb": 7.076,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-021",
+    "assetId": "kl10-section",
+    "eventTime": "2026-07-15T07:40:00Z",
+    "relativePdIndicatorDb": 7.074,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-022",
+    "assetId": "kl10-section",
+    "eventTime": "2026-07-16T07:40:00Z",
+    "relativePdIndicatorDb": 6.862,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-023",
+    "assetId": "kl10-section",
+    "eventTime": "2026-07-17T07:40:00Z",
+    "relativePdIndicatorDb": 7.405,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-024",
+    "assetId": "kl10-section",
+    "eventTime": "2026-07-18T07:40:00Z",
+    "relativePdIndicatorDb": 7.618,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-025",
+    "assetId": "kl10-section",
+    "eventTime": "2026-07-19T07:40:00Z",
+    "relativePdIndicatorDb": 8.396,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-026",
+    "assetId": "kl10-section",
+    "eventTime": "2026-07-20T07:40:00Z",
+    "relativePdIndicatorDb": 9.041,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-027",
+    "assetId": "kl10-section",
+    "eventTime": "2026-07-21T07:40:00Z",
+    "relativePdIndicatorDb": 10.073,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-028",
+    "assetId": "kl10-section",
+    "eventTime": "2026-07-22T07:40:00Z",
+    "relativePdIndicatorDb": 10.654,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-029",
+    "assetId": "kl10-section",
+    "eventTime": "2026-07-23T07:40:00Z",
+    "relativePdIndicatorDb": 11.116,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  },
+  {
+    "sampleId": "cable-030",
+    "assetId": "kl10-section",
+    "eventTime": "2026-07-24T07:40:00Z",
+    "relativePdIndicatorDb": 12.158,
+    "reference": "synthetic_device_reference_only",
+    "unit": "dB_ref_demo",
+    "origin": "synthetic"
+  }
+]

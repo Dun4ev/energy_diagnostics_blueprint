@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "0.1.0",
+  "productName": "ЭнергоДиагностика · DEMO",
+  "organizationName": "Демонстрационная организация",
+  "logoLight": null,
+  "logoDark": null,
+  "logoAlt": "Название организации",
+  "favicon": null,
+  "locale": "ru-RU",
+  "timezone": "Europe/Moscow",
+  "tokens": {
+    "nav.background": "#0B3556",
+    "brand.primary": "#0069B4",
+    "canvas": "#F3F7FA",
+    "surface": "#FFFFFF",
+    "border": "#D6E2EC",
+    "text.primary": "#17334D",
+    "text.secondary": "#52677A",
+    "risk.high.text": "#B42336",
+    "risk.high.bg": "#FDECEF",
+    "risk.medium.text": "#8A5200",
+    "risk.medium.bg": "#FFF3D6",
+    "risk.low.text": "#0E6B4A",
+    "risk.low.bg": "#E7F5ED",
+    "quality.unknown.text": "#475467",
+    "quality.unknown.bg": "#EDF0F4",
+    "chart.observed": "#C65D00",
+    "chart.expected": "#0066B3",
+    "chart.forecast": "#6A4C93",
+    "topology.energized": "#D92D20",
+    "topology.deenergized": "#0E7A53",
+    "topology.unknown": "#667085"
+  },
+  "features": {
+    "diagnostics": true,
+    "riskQueue": true,
+    "workPlans": true,
+    "defectsMinimal": true,
+    "directorDashboard": false,
+    "realDeviceConnection": false,
+    "externalAi": false
+  },
+  "safety": {
+    "advisoryOnly": true,
+    "controlCommandsAllowed": false,
+    "demoBannerRequired": true
+  }
+}

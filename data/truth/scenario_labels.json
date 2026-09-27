@@ -1,0 +1,37 @@
+[
+  {
+    "assetId": "tp177-t1",
+    "profile": "progressive_heat",
+    "expectedReview": "increasing residual, request independent verification"
+  },
+  {
+    "assetId": "tp204-t2",
+    "profile": "healthy",
+    "expectedReview": "normal observation, no invented defect"
+  },
+  {
+    "assetId": "tp305-t1",
+    "profile": "load_step",
+    "expectedReview": "normal model-adjusted residual despite temperature rise"
+  },
+  {
+    "assetId": "tp306-t1",
+    "profile": "sensor_drift",
+    "expectedReview": "sensor discrepancy; do not confirm contact defect"
+  },
+  {
+    "assetId": "tp307-t1",
+    "profile": "data_quality",
+    "expectedReview": "unknown latest assessment, request source recovery"
+  },
+  {
+    "assetId": "tp308-t1",
+    "profile": "post_intervention",
+    "expectedReview": "recovered signal; closure still needs human verification"
+  },
+  {
+    "assetId": "tp309-t1",
+    "profile": "accelerating_heat",
+    "expectedReview": "short-window growth exceeds long-window growth; escalate review"
+  }
+]

@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "0.1.0",
+  "analysisRunId": "reference-ag-2026-017-r1",
+  "assetId": "tp177-t1",
+  "scenarioRunId": "reference-slide29",
+  "asOf": "2026-07-24T07:42:00Z",
+  "mode": "reference",
+  "status": "requires_review",
+  "modelVersion": null,
+  "policyVersion": null,
+  "inputSnapshotId": "source-slide29",
+  "calculationOrigin": "presentation_illustration",
+  "quality": {
+    "overall": "partial",
+    "freshSources": 3,
+    "totalSources": 4,
+    "coverage": null,
+    "issues": [
+      "Термограмма требует обновления по условиям иллюстрации.",
+      "Историческая полнота не указана в источнике."
+    ]
+  },
+  "metrics": {
+    "observedTemperatureC": 80,
+    "expectedTemperatureC": 68,
+    "residualC": 12,
+    "loadFraction": 0.74,
+    "ambientC": 27,
+    "slopeCPerDay": null,
+    "trendWindowHours": null,
+    "failureProbability": null
+  },
+  "risk": {
+    "score": 7.2,
+    "scaleMax": 10,
+    "priority": "high",
+    "label": "Пилотная шкала из презентации; формула не предоставлена",
+    "probabilistic": false
+  },
+  "hypotheses": [
+    {
+      "code": "local_contact_heating",
+      "title": "Локальный нагрев контактного соединения",
+      "status": "unconfirmed",
+      "supportEvidenceIds": [],
+      "missingEvidence": [
+        "Точное место измерения температуры",
+        "Свежая подтверждённая термография",
+        "Сопоставление фаз"
+      ]
+    }
+  ],
+  "nextActions": [
+    {
+      "code": "VERIFY_TELEMETRY",
+      "reason": "Проверить телеметрию и калибровку датчика",
+      "dueWithinHours": null,
+      "requiresHumanApproval": true
+    },
+    {
+      "code": "REQUEST_THERMOGRAPHY",
+      "reason": "На слайде: осмотр не позднее 48 часов; точка отсчёта требует уточнения",
+      "dueWithinHours": 48,
+      "requiresHumanApproval": true
+    }
+  ],
+  "monitoringWindow": {
+    "minDays": 7,
+    "maxDays": 14,
+    "isFailureDateForecast": false
+  },
+  "advisoryOnly": true,
+  "controlCommandsAllowed": false
+}
