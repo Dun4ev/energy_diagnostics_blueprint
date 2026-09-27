@@ -1,0 +1,43 @@
+# Независимая приемка G4: локальный демонстрационный прототип
+
+**Решение:** локальную демонстрацию принять. Применение на действующем оборудовании не принято и не проверялось. Критических дефектов в проверенном browser/API пути не осталось.
+
+Дата: 2026-09-27. База reviewer: `989a5a6` (G3 handoff), проверенный production: `2e3617d`. Reviewer ранее реализовал backend этапа 04, но не писал UI, replay worker или численное ядро. Backend/workflow независимо проверял другой reviewer в `verification/WORKFLOW_REVIEW.md`; numerical core проверен отдельно в `verification/CORE_REVIEW.md`. Этот документ фиксирует собственную независимую UI/integration проверку и явно отличает ее от результатов G3.
+
+Среда: локальный Docker Compose на macOS arm64, единственный опубликованный порт `127.0.0.1:8080`; health `status=ok`, `businessRuntime=ready`, `stage=integrated`. Playwright 1.63.0, Chromium 153.0.8010.12, viewport DPR 1, системная зона браузера Europe/Belgrade, интерфейсная зона Europe/Moscow (МСК), CSS font check сообщил доступность Inter. Пароли demo-ролей читались тестом из ignored `infra/.env` только в памяти и не выводились. Начальный seed при создании runs: `20260925`; REFERENCE время 24.07.2026 10:42 МСК, поздний SIMULATION 24.07.2026 10:40 МСК, ранний период создавался отдельно.
+
+## Фактически выполнено
+
+Команда из отдельного reviewer worktree с временной ссылкой на уже установленные зависимости основного checkout:
+
+```text
+QA_ENV_FILE=/Users/j15/Documents/Code_and_Scripts_local/prototypes/energy_diagnostics_blueprint/infra/.env node_modules/.bin/playwright test -c tests/final-qa/playwright.config.mjs
+3 passed (35.1 s)
+```
+
+Тесты `tests/final-qa/acceptance.spec.mjs` открывали реальный `http://127.0.0.1:8080`, создавали отдельные runs и проверяли реальные ответы API. Ссылка на `node_modules` не включена в commit. В основном checkout после переноса тест запускается той же командой без `QA_ENV_FILE`, если настроен `infra/.env`. Повторный запуск создаст новые demo runs и заметки в PostgreSQL. Он не сбрасывает старые данные.
+
+| Область | Собственная проверка | Итог |
+|---|---|---|
+| D/C, расчет | Сопоставлены live envelope/queue/case с `mode`, `dataTime`, `analysisRunId`, `failureProbability=null`; ранний период не получил case по вымышленному ID, неизвестные активы остались `unknown`. Численные регрессии C01-C09 проверены ранее в `CORE_REVIEW.md`, их не выдаю за новый браузерный прогон. | Пройдено для синтетики; эксплуатационная точность не установлена. |
+| W01, W07 | В позднем SIMULATION инженер в UI добавил заметку, затем с выбранной записью выполнил `detected → under_review → awaiting_evidence → confirmed`; создал draft plan. API подтвердил тот же case/analysisRunId, возросшие ревизии, без автоматического подтверждения. | Пройдено. |
+| W04-W06 | Viewer с валидной сессией/CSRF получил прямой HTTP 403 на approve, действие отсутствовало в UI. Stale replay и stale submit дали 409. После новой записи доказательства попытка submit из ранее открытой формы дала реальный 409 и понятное сообщение; план помечен устаревшим. | Пройдено. |
+| W09-W10 | Ранний SIMULATION после шага 1 час сохранил тот же run и увеличил виртуальное время ровно на 3600 с; новый выбор создал другой run. Актив без case открывается из очереди как asset, без 404. | Пройдено для pause/step/new run; скорости 10/60 и restart проверялись в G3, не здесь. |
+| S01-S03, S06-S07 | Просмотрены runtime mounts в `infra/compose.yaml`: worker получает observations read-only, API/worker не монтируют `data/truth`; 0 внешних запросов и 0 service-worker registrations в браузерном сценарии. REFERENCE показывает 80/68/+12 °C, 74% и 7,2/10 как иллюстрацию; T-2 имеет `unknown`. SIMULATION показывал вычисленные 62,2/47,0/+15,2 °C, 64%, 8,4/10. Экспорт JSON содержит mode/dataTime и null probability; print CSS показывает mode/time. | Пройдено в локальном контуре. Не проверялась внешняя конфигурация AI. |
+| V01-V06, V09-V10 | Визуально просмотрены `queue/case/plan` на 390×844, 1024×768, 1440×1000, 1920×1080, case при CSS zoom 125%; документ не выходил за viewport (таблицы прокручиваются внутри). Проверены мобильное меню, Escape/focus, fallback значка при `logoLight=null`, разные линии observed/expected, подписи provenance/качества и предупреждение об advisory-only. | Пройдено в Chromium. |
+| V07-V08 | Проверены loading, пустой фильтр, 404, потеря API с сохраненной очередью, настоящее browser-offline событие без нового запроса, SPA-переход к кешированной очереди и восстановление после reconnect; действия исчезают/блокируются. Неожиданных 5xx, внешних запросов и консольных ошибок в проверенном сценарии не было. MSW не зарегистрирован. | Пройдено. |
+
+Смежные G3 результаты, выполненные интегратором, перечислены в `handoffs/07-integration.md`: 60 Python tests, 22 Vitest, contract drift/build/lint, real two-role browser flow, lost-response plan idempotency, restart и backup/restore. Я изучил их отчеты, но не повторял полный suite и не называю его собственным прогоном. Независимый backend/workflow reviewer отдельно подтвердил 403/409, gates, persistence и локальное восстановление; эти проверки не подменяются моими UI тестами.
+
+## Скриншоты и визуальное решение
+
+Файлы `verification/final-qa-*.png` созданы браузером и просмотрены как изображения, а не только через DOM. Основные: `final-qa-reference-case-1440.png` (сравнение со slide29), `final-qa-case-mobile-chart-polish.png`, `final-qa-case-mobile-native-offline.png`, `final-qa-queue-mobile-native-offline.png`, `final-qa-stale-plan-409.png`, `final-qa-case-1440-zoom125.png`. Полная матрица `final-qa-{queue,case,plan}-{390,1024,1440,1920}.png` содержит 12 снимков; дополнительные снимки показывают пустой фильтр, 404 и API-offline. Ось графика после исправления показывает разреженные метки в МСК на 390 px. На мобильном таблица рисков прокручивается горизонтально внутри карточки, без overflow всей страницы.
+
+## Ограничения и остаточные замечания
+
+- **Не дефект, граница REFERENCE:** live reference run не засеивает `reference-work-plan.json`; иллюстрация воспроизводит анализ и схему, а полный plan workflow показывается в SIMULATION. Это явно указано в G3 handoff.
+- **V02, низкая важность:** на 390 px часть столбцов очереди видна только после горизонтальной прокрутки таблицы. Основные объект, наблюдение и приоритет видны сразу; явной подсказки прокрутки нет. Признаков обрезанных кнопок или document overflow не обнаружено.
+- Масштаб 125% проверен через CSS `zoom`, не через системный browser zoom. Safari, Firefox, screen reader, печатный PDF и длительный offline без кеша не проверялись.
+- Тесты UI ограничены synthetic/reference fixtures. Полевая идентификация датчиков, термограммы, фактическая точность и пороги, OT-интеграция, промышленная безопасность и восстановление после отказа другого хоста требуют отдельной программы испытаний. Никаких команд оборудованию в этом прототипе нет.
+
+**Итог:** G4 для локального advisory demo принят на production commit `2e3617d`; field validation и промышленный ввод отклонены как находящиеся вне проверенного объема.
