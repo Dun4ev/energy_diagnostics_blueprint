@@ -186,7 +186,7 @@ test('late-period case decisions, plan and responsive views', async ({ browser }
   expect(caseId).toBeTruthy();
   await page.goto(`/diagnostics/cases/${caseId}?run=${run}`);
   await expect(page.getByRole('heading', { name: queue.data.items.find(item => item.caseId)?.asset.name })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Решение по случаю' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Решение по случаю|Взять на рассмотрение|Указать недостающие материалы/ })).toBeVisible();
   await page.getByRole('button', { name: 'Открыть записи' }).click();
   const evidenceDialog = page.getByRole('dialog', { name: 'Доказательства' });
   await evidenceDialog.getByLabel('Наблюдение').fill('QA: осмотр измерения требуется; это демонстрационная заметка, дефект не доказан.');
@@ -202,7 +202,22 @@ test('late-period case decisions, plan and responsive views', async ({ browser }
     ['awaiting_evidence', 'Ожидает доказательств'],
     ['confirmed', 'Подтвержден человеком'],
   ]) {
-    await expect(page.getByRole('button', { name: 'Решение по случаю' })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Решение по случаю|Взять на рассмотрение|Указать недостающие материалы/ })).toBeVisible();
+    if (target === 'under_review') {
+      await page.getByRole('button', {name:'Взять на рассмотрение',exact:true}).click();
+      await expect(page.getByRole('dialog')).toHaveCount(0);
+      await expect(page.getByText(label,{exact:true}).first()).toBeVisible();
+      continue;
+    }
+    if (target === 'awaiting_evidence') {
+      await page.getByRole('button', {name:'Указать недостающие материалы'}).click();
+      const request = page.getByRole('dialog', {name:'Указать недостающие материалы'});
+      await request.getByLabel('Какие материалы нужны и зачем').fill('Нужна независимая термография для проверки нагрева.');
+      await request.getByRole('button', {name:'Перевести в ожидание'}).click();
+      await expect(request).toBeHidden();
+      await expect(page.getByText(label,{exact:true}).first()).toBeVisible();
+      continue;
+    }
     await page.getByRole('button', { name: 'Решение по случаю' }).click();
     const dialog = page.getByRole('dialog', { name: 'Решение по случаю' });
     await dialog.getByLabel('Новое состояние').selectOption(target);
@@ -305,11 +320,11 @@ test('browser offline event preserves cached SPA navigation and restores actions
   expect(caseEntry).toBeTruthy();
   await page.goto(`/diagnostics/cases/${caseEntry.caseId}?run=${run}`);
   await expect(page.getByRole('img', { name: 'График измеренной и ожидаемой температуры' }).locator('svg')).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Решение по случаю' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Решение по случаю|Взять на рассмотрение|Указать недостающие материалы/ })).toBeVisible();
   await screen(page, 'case-mobile-chart-polish');
   await page.context().setOffline(true);
   await expect(page.getByText('Нет сети')).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Решение по случаю' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /Решение по случаю|Взять на рассмотрение|Указать недостающие материалы/ })).toHaveCount(0);
   await screen(page, 'case-mobile-native-offline');
   await page.getByRole('button', { name: 'Открыть меню' }).click();
   await page.getByRole('navigation', { name: 'Главная навигация' }).getByRole('link', { name: 'Очередь рисков' }).click();

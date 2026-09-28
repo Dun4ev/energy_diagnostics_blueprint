@@ -113,43 +113,30 @@ const scenes=[
     "seconds": 10
   },
   {
-    "name": "Принять случай в работу",
+    "name": "Взять на рассмотрение",
     "role": "engineer",
-    "screen": "decision",
-    "button": "Записать решение",
-    "fields": [
-      [
-        "Новое состояние",
-        "На рассмотрении"
-      ],
-      [
-        "Основание",
-        "Учебный разбор ТП-177: проверяю отклонение температуры и качество данных. Дефект пока не подтверждаю."
-      ]
-    ],
+    "screen": "case",
+    "button": "Взять на рассмотрение",
+    "fields": [],
     "after": "На рассмотрении",
-    "say": "Это отдельное решение человека. Оно сохраняется с основанием и автором.",
-    "where": "Карточка случая → Инженерный вывод → Решение по случаю",
+    "say": "Одно нажатие фиксирует начало разбора, автора и время. Повторно вводить основание не нужно.",
+    "where": "Карточка случая → Инженерный вывод → Взять на рассмотрение",
     "seconds": 12
   },
   {
-    "name": "Запросить подтверждение",
+    "name": "Указать недостающие материалы",
     "role": "engineer",
     "screen": "decision",
-    "button": "Записать решение",
+    "button": "Перевести в ожидание",
     "fields": [
       [
-        "Новое состояние",
-        "Ожидает доказательств"
-      ],
-      [
-        "Основание",
-        "Для учебного разбора нужна независимая проверка. Реальных измерений здесь нет."
+        "Какие материалы нужны и зачем",
+        "Нужна независимая термография контакта, чтобы проверить дополнительный нагрев. Реальных измерений в демонстрации нет."
       ]
     ],
     "after": "Ожидает доказательств",
-    "say": "Это отдельное решение человека. Оно сохраняется с основанием и автором.",
-    "where": "Карточка случая → Инженерный вывод → Решение по случаю",
+    "say": "Один раз указываю недостающие материалы. Система сохраняет причину ожидания, но не отправляет запрос исполнителю.",
+    "where": "Карточка случая → Инженерный вывод → Указать недостающие материалы",
     "seconds": 12
   },
   {
@@ -698,7 +685,7 @@ function draw(canvas,n,w=1280,sd=seed){n=Math.round(clamp(n,0,TOTAL-1));const in
  let target={x:760,y:570};const form=['decision','create','edit','evidence','result','planDialog','login','scenario'].includes(s.screen);
  if(s.screen==='terminal'){box(c,180,192,660,378,palette.nav);txt(c,'ТЕРМИНАЛ',200,220,14,'#b7d4e8',true);wrap(c,s.fields[0][1].slice(0,Math.ceil(s.fields[0][1].length*clamp(t/.68))),200,264,610,20,'#fff',10);target=button(c,'Enter',690,588,130,t>.72);}
  else if(s.screen==='docker'){txt(c,'Docker Desktop',200,226,28,palette.ink,true);box(c,220,277,580,185,'#f3f7fa',palette.border);txt(c,done?'Engine running':t<.2?'Откройте приложение':'Запуск движка…',250,338,27,done?palette.green:palette.blue,true);box(c,250,380,510,6,palette.border);box(c,250,380,510*ease(t/.8),6,done?palette.green:palette.blue);target=button(c,'Открыть Docker Desktop',460,507,300,t>.72);}
- else if(form){const title=s.screen==='evidence'?'Доказательства · Добавить заметку':s.screen==='decision'?'Решение по случаю':s.screen==='result'?'Записать результат проверки':s.screen==='create'?'Проект проверочных мероприятий':s.screen==='edit'?'Редактировать проект':s.screen==='login'?'Вход в демонстрационный контур':s.screen==='scenario'?'Синтетический расчет':s.where.split(' → ').at(-1);
+ else if(form){const title=s.screen==='evidence'?'Доказательства · Добавить заметку':s.screen==='decision'?(s.name==='Указать недостающие материалы'?s.name:'Решение по случаю'):s.screen==='result'?'Записать результат проверки':s.screen==='create'?'Проект проверочных мероприятий':s.screen==='edit'?'Редактировать проект':s.screen==='login'?'Вход в демонстрационный контур':s.screen==='scenario'?'Синтетический расчет':s.where.split(' → ').at(-1);
  box(c,180,190,660,435,'#fff',palette.border);wrap(c,title,200,220,610,21,palette.ink,2);let y=251;
  const rows=s.fields,available=286,unit=Math.min(132,available/Math.max(1,rows.length));
  rows.forEach(([label,value],j)=>{txt(c,label,200,y,14,palette.muted,true);const isChoice=value.startsWith('☑'),progress=clamp((t-.12-j*.10)/.38),visible=value.slice(0,Math.ceil(value.length*progress));box(c,200,y+10,620,unit-29,isChoice?'#edf4fa':'#f8fafc',palette.border);wrap(c,visible,212,y+33,593,16,palette.ink,Math.max(1,Math.floor((unit-36)/21.6)));y+=unit;});
@@ -708,7 +695,7 @@ function draw(canvas,n,w=1280,sd=seed){n=Math.round(clamp(n,0,TOTAL-1));const in
  else if(s.screen==='viewer'){txt(c,'План проверки · ТП-177',185,220,25,palette.ink,true);txt(c,'На согласовании',185,255,18);box(c,185,280,650,210,'#f8fafc',palette.border);txt(c,'Шаги проверки',205,311,19,palette.ink,true);txt(c,'1. Запросить термографию',205,355,18);txt(c,'2. Рассмотреть инженеру',205,394,18);txt(c,'Кнопка «Согласовать» отсутствует',205,447,19,palette.muted);target={x:808,y:129};}
  else if(s.screen==='history'){txt(c,'Ход рассмотрения',185,221,26,palette.ink,true);['Инженер · На рассмотрении','Инженер · Добавлена запись','Согласующий · Согласован','Исполнитель · Записан результат шага','Согласующий · Выполнен','Согласующий · Закрыт'].forEach((v,i)=>{box(c,187,248+i*49,646,40,i===5&&done?'#e7f5ed':'#f3f7fa');txt(c,v,200,275+i*49,16);});target={x:736,y:514};}
  else{txt(c,'ТП-177 / Т-1',182,216,26,palette.ink,true);txt(c,'Диагностический случай',182,240,14,palette.muted);box(c,180,262,350,241,'#f8fafc',palette.border);txt(c,'Температура с поправкой',194,285,16,palette.ink,true);txt(c,'на нагрузку',194,307,16,palette.ink,true);for(let k=0;k<2;k++){c.beginPath();for(let x=0;x<=298;x+=3){let y=382+Math.sin(x/38)*29+k*31;c.lineTo(200+x,y);}c.strokeStyle=k?palette.blue:'#c65d00';c.lineWidth=2;c.stroke();}txt(c,'Схематичный график',195,473,12,palette.muted);
- box(c,550,262,289,140,'#fff',palette.border);txt(c,'Доказательства и качество',563,288,16,palette.ink,true);const ev=button(c,'Открыть записи',566,341,255,s.button==='Открыть записи'&&t>.72);box(c,550,418,289,154,'#fff',palette.border);txt(c,'Инженерный вывод',564,445,18,palette.ink,true);wrap(c,'Гипотеза, а не автоматически подтвержденный дефект',564,476,254,15,palette.muted,3);const dec=button(c,'Решение по случаю',566,525,255);
+ box(c,550,262,289,140,'#fff',palette.border);txt(c,'Доказательства и качество',563,288,16,palette.ink,true);const ev=button(c,'Открыть записи',566,341,255,s.button==='Открыть записи'&&t>.72);box(c,550,418,289,154,'#fff',palette.border);txt(c,'Инженерный вывод',564,445,18,palette.ink,true);wrap(c,'Гипотеза, а не автоматически подтвержденный дефект',564,476,254,15,palette.muted,3);const dec=button(c,s.button==='Взять на рассмотрение'?'Взять на рассмотрение':'Решение по случаю',566,525,255);
  if(s.button==='Открыть записи')target=ev;else if(s.button==='Экспорт JSON')target=button(c,'Экспорт JSON',666,194,173,t>.72);else if(s.button==='Остаток')target=button(c,'Остаток',359,523,170,t>.72);else target=dec;}
  if(done){box(c,180,590,660,47,'#e7f5ed');wrap(c,'✓ '+s.after,195,619,630,17,palette.green,1);}
  const from={x:350,y:631},p={x:from.x+(target.x-from.x)*ease(t/.68),y:from.y+(target.y-from.y)*ease(t/.68)};if(!done)cursor(c,p,t);

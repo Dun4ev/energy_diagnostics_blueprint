@@ -1,6 +1,6 @@
 {
-  "caseUrl": "http://127.0.0.1:8080/diagnostics/cases/40a4d7a9-2973-4e7a-bbac-c31546f480a8?run=ef57c9bf-a4a5-4345-aa0d-8776fc4f8602",
-  "planUrl": "http://127.0.0.1:8080/work-plans/bffaa761-c51c-42fa-b224-be1a635ad146?run=ef57c9bf-a4a5-4345-aa0d-8776fc4f8602",
+  "caseUrl": "http://127.0.0.1:8080/diagnostics/cases/ace21474-ae76-4c95-8c9f-6918761fb341?run=e059da59-797b-4b6f-aa99-bb9c96b6ed7b",
+  "planUrl": "http://127.0.0.1:8080/work-plans/ce8ca0de-af12-4acf-9a7d-56e2a5fb76b7?run=e059da59-797b-4b6f-aa99-bb9c96b6ed7b",
   "steps": 2,
   "caseState": "Закрыт",
   "planState": "Выполнен",

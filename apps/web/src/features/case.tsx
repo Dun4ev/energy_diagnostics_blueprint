@@ -58,20 +58,32 @@ function CaseDecision({ snapshot, identity, run, refresh }: { snapshot: Snapshot
   const [pending, setPending] = useState(false);
   const [failure, setFailure] = useState<ApiFailure | null>(null);
   const allowed = identity && snapshot.analysis.mode === 'simulation' && (identity.permissions.includes('case.review') || identity.permissions.includes('case.confirm') || identity.permissions.includes('case.close'));
-  async function submit(event: React.FormEvent) {
-    event.preventDefault(); if (!identity) return;
+  const taking = snapshot.case.state === 'detected';
+  const requesting = snapshot.case.state === 'under_review';
+  const title = requesting ? 'Указать недостающие материалы' : 'Решение по случаю';
+  async function commit(next: S['CaseState'], explanation: string) {
+    if (!identity || pending) return;
     setPending(true); setFailure(null);
     try {
       expectData(await api.POST('/api/v1/cases/{id}/decisions', { params: { path: { id: snapshot.case.caseId }, query: { scenarioRunId: run }, header: mutationHeaders(identity) }, body: {
-        targetState: target, expectedRevision: snapshot.case.revision, evidenceRevision: snapshot.case.evidenceRevision,
+        targetState: next, expectedRevision: snapshot.case.revision, evidenceRevision: snapshot.case.evidenceRevision,
         evidenceIds: selectedEvidence,
-        reason, outcome: target === 'closed' || target === 'not_confirmed' || target === 'sensor_issue' ? reason : null,
+        reason: explanation, outcome: next === 'closed' || next === 'not_confirmed' || next === 'sensor_issue' ? explanation : null,
       } }));
       setOpen(false); setReason(''); refresh();
     } catch (error) { setFailure(error instanceof ApiFailure ? error : new ApiFailure(0, 'Нет связи с сервером.')); if (error instanceof ApiFailure && error.status === 409) refresh(); }
     finally { setPending(false); }
   }
-  return <>{allowed && targets.length > 0 && <Button onClick={() => setOpen(true)}>Решение по случаю</Button>}<Dialog open={open} onClose={() => setOpen(false)} title="Решение по случаю"><form className="feature-form" onSubmit={submit}><p className="feature-muted">Текущая ревизия {snapshot.case.revision}, доказательства {snapshot.case.evidenceRevision}. Сервер проверит полномочия и актуальность.</p><label className="field">Новое состояние<select value={target} onChange={event => setTarget(event.target.value as S['CaseState'])}>{targets.map(item => <option key={item} value={item}>{stateLabel[item]}</option>)}</select></label><label className="field">Основание<textarea value={reason} onChange={event => setReason(event.target.value)} required /></label><fieldset className="feature-evidence-choice"><legend>Записи, на которых основано решение</legend>{snapshot.evidence.length === 0 ? <p>Сначала добавьте запись в разделе доказательств.</p> : snapshot.evidence.map(item => <label key={item.evidenceId}><input type="checkbox" checked={selectedEvidence.includes(item.evidenceId)} onChange={event => setSelectedEvidence(previous => event.target.checked ? [...previous, item.evidenceId] : previous.filter(id => id !== item.evidenceId))} />{item.text} · {date(item.observedAt)}</label>)}</fieldset>{failure && <ErrorState message={failure.status === 409 ? 'Случай изменился. Данные обновляются; проверьте ревизию.' : failure.status === 403 ? 'Нет права на это решение.' : failure.message} requestId={failure.requestId} />}<div className="dialog-actions"><Button type="button" onClick={() => setOpen(false)}>Отмена</Button><Button variant="primary" disabled={pending}>{pending ? 'Сохраняем...' : 'Записать решение'}</Button></div></form></Dialog></>;
+  const error = failure && <ErrorState message={failure.status === 409 ? 'Случай изменился. Данные обновляются; проверьте ревизию.' : failure.status === 403 ? 'Нет права на это решение.' : failure.message} requestId={failure.requestId} />;
+  return <>{allowed && targets.length > 0 && <Button disabled={pending} onClick={() => taking ? void commit('under_review', 'Инженер принял случай на рассмотрение.') : setOpen(true)}>{pending ? 'Сохраняем...' : taking ? 'Взять на рассмотрение' : title}</Button>}
+    {taking && error}
+    <Dialog open={open} onClose={() => setOpen(false)} title={title}><form className="feature-form" onSubmit={event => { event.preventDefault(); void commit(requesting ? 'awaiting_evidence' : target, reason); }}>
+      {requesting ? <p className="feature-muted">Укажите, каких материалов не хватает для вывода. Случай перейдет в ожидание доказательств. Запрос исполнителю автоматически не отправляется.</p> : <><p className="feature-muted">Сервер проверит полномочия и актуальность данных.</p><label className="field">Новое состояние<select value={target} onChange={event => setTarget(event.target.value as S['CaseState'])}>{targets.map(item => <option key={item} value={item}>{stateLabel[item]}</option>)}</select></label></>}
+      <label className="field">{requesting ? 'Какие материалы нужны и зачем' : 'Основание'}<textarea value={reason} onChange={event => setReason(event.target.value)} required /></label>
+      {!requesting && <fieldset className="feature-evidence-choice"><legend>Записи, на которых основано решение</legend>{snapshot.evidence.length === 0 ? <p>Сначала добавьте запись в разделе доказательств.</p> : snapshot.evidence.map(item => <label key={item.evidenceId}><input type="checkbox" checked={selectedEvidence.includes(item.evidenceId)} onChange={event => setSelectedEvidence(previous => event.target.checked ? [...previous, item.evidenceId] : previous.filter(id => id !== item.evidenceId))} />{item.text} · {date(item.observedAt)}</label>)}</fieldset>}
+      {error}<div className="dialog-actions"><Button type="button" onClick={() => setOpen(false)}>Отмена</Button><Button variant="primary" disabled={pending}>{pending ? 'Сохраняем...' : requesting ? 'Перевести в ожидание' : 'Записать решение'}</Button></div>
+    </form></Dialog></>;
+
 }
 
 function CreatePlan({ snapshot, identity, run }: { snapshot: Snapshot; identity: Identity | null; run: string }) {
