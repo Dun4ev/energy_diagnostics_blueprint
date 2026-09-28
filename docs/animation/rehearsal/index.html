@@ -1,0 +1,728 @@
+<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Репетиция · ЭнергоДиагностика</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#e8eff4;color:#17334d;font:16px system-ui,sans-serif}main{max-width:1440px;margin:auto;padding:20px}h1{font-size:22px;margin:0 0 8px}p{line-height:1.55}canvas{display:block;width:100%;height:auto;background:#f3f7fa;border-radius:8px}nav{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:16px 0}button,select{font:inherit;padding:10px 14px;border:1px solid #adbfcd;border-radius:6px;background:#fff;color:#17334d}button{cursor:pointer}button:disabled{opacity:.5;cursor:default}button.primary{background:#0069b4;color:white;border-color:#0069b4}select{max-width:100%;flex:1;min-width:180px}input[type=range]{flex:1;min-width:140px}output{font-variant-numeric:tabular-nums}#notes{display:grid;grid-template-columns:1fr 1fr;gap:16px}section{background:white;padding:18px;border-radius:8px;min-width:0}h2{font-size:16px;margin:0 0 10px;color:#0069b4}#fields p{white-space:pre-wrap;overflow-wrap:anywhere}small{color:#52677a}a{color:#0069b4}.intro{margin:0 0 16px}.current{font-weight:600}@media(max-width:700px){main{padding:12px}#notes{grid-template-columns:1fr}button{padding:9px 11px}h1{font-size:19px}}</style>
+<main><h1>Запуск и проверка: репетиция по кнопкам</h1><p class="intro">Учебная схема интерфейса, не запись экрана. Все примеры синтетические. «Далее» проигрывает один шаг и останавливается. Команды и тексты доступны под кадром.</p><canvas id="screen" aria-describedby="notes" aria-label="Анимация текущего шага репетиции"></canvas>
+<nav><button id="prev">← Назад</button><button id="next" class="primary">Далее →</button><button id="repeat">Повторить шаг</button><button id="play">Автопоказ</button><label for="scene">Шаг</label><select id="scene"></select></nav><nav><input id="seek" type="range" aria-label="Покадровая перемотка"><output id="time"></output></nav>
+<div id="notes"><section><h2 id="stepTitle"></h2><p id="where"></p><div id="fields"></div><p><strong>Результат: </strong><span id="outcome"></span></p></section><section><h2>Что сказать</h2><p id="speech"></p><p><small id="role"></small></p><small>Пароли не записаны в анимации. Используйте значения из локального infra/.env. Названия и порядок сверены с интерфейсом. Не подтверждайте реальный дефект учебной заметкой.</small></section></div><p><a href="?grid=24">Контрольный лист</a> · <a href="index.html">Вернуться к плееру</a> · <a href="../../runbook/REHEARSAL.md">Подробный сценарий</a></p></main>
+<script>
+'use strict';
+const scenes=[
+  {
+    "name": "Открыть Docker Desktop",
+    "role": "Подготовка",
+    "screen": "docker",
+    "button": "Открыть Docker Desktop",
+    "fields": [],
+    "after": "Engine running",
+    "say": "Сначала готовлю локальную среду. Фактическое ожидание может быть дольше.",
+    "where": "Открыть Docker Desktop на компьютере",
+    "seconds": 8
+  },
+  {
+    "name": "Папка и локальные пароли",
+    "role": "Подготовка",
+    "screen": "terminal",
+    "button": "Выполнить в Терминале",
+    "fields": [
+      [
+        "Команды",
+        "cd /Users/j15/Documents/Code_and_Scripts_local/prototypes/energy_diagnostics_blueprint\npython3 scripts/init_local_env.py"
+      ]
+    ],
+    "after": "Пароли созданы или сохранены",
+    "say": "Пароли остаются в локальном файле. На демонстрации не показываю его содержимое.",
+    "where": "Терминал → основной checkout",
+    "seconds": 14
+  },
+  {
+    "name": "Запустить приложение",
+    "role": "Подготовка",
+    "screen": "terminal",
+    "button": "Выполнить в Терминале",
+    "fields": [
+      [
+        "Команда",
+        "docker compose --env-file infra/.env -p energy-diagnostics -f infra/compose.yaml up --build -d --wait"
+      ]
+    ],
+    "after": "Сервисы готовы",
+    "say": "Дожидаюсь успешного запуска. Сборка может занять несколько минут.",
+    "where": "Терминал → команда из основной папки",
+    "seconds": 14
+  },
+  {
+    "name": "Войти: engineer",
+    "role": "engineer",
+    "screen": "login",
+    "button": "Войти",
+    "fields": [
+      [
+        "Пользователь",
+        "engineer"
+      ],
+      [
+        "Пароль",
+        "•••••••• (из локального infra/.env)"
+      ]
+    ],
+    "after": "Роль: engineer",
+    "say": "Работаю под отдельной ролью. Новая вкладка сама по себе пользователя не меняет.",
+    "where": "Откройте http://127.0.0.1:8080 → форма входа",
+    "seconds": 10
+  },
+  {
+    "name": "Выбрать синтетический сценарий",
+    "role": "engineer",
+    "screen": "scenario",
+    "button": "Открыть сценарий",
+    "fields": [
+      [
+        "Время среза",
+        "Последний срез"
+      ]
+    ],
+    "after": "SIMULATION · июль 2026",
+    "say": "Это синтетика. Время данных отличается от текущего времени компьютера.",
+    "where": "http://127.0.0.1:8080 → Сменить набор → карточка «Синтетический расчет»",
+    "seconds": 12
+  },
+  {
+    "name": "Открыть ТП-177",
+    "role": "engineer",
+    "screen": "queue",
+    "button": "ТП-177 / Т-1",
+    "fields": [],
+    "after": "Диагностический случай",
+    "say": "Открываю объект из очереди приоритетов. Индекс не является вероятностью отказа.",
+    "where": "Слева «Очередь рисков» → название ТП-177 в таблице",
+    "seconds": 10
+  },
+  {
+    "name": "Посмотреть отклонение",
+    "role": "engineer",
+    "screen": "case",
+    "button": "Остаток",
+    "fields": [
+      [
+        "Период",
+        "72 часа"
+      ]
+    ],
+    "after": "Показан остаток",
+    "say": "Сравниваю измеренную и ожидаемую температуру, затем отклонение и качество данных.",
+    "where": "Над графиком: «Период» → «72 часа», кнопка «Остаток»",
+    "seconds": 10
+  },
+  {
+    "name": "Принять случай в работу",
+    "role": "engineer",
+    "screen": "decision",
+    "button": "Записать решение",
+    "fields": [
+      [
+        "Новое состояние",
+        "На рассмотрении"
+      ],
+      [
+        "Основание",
+        "Учебный разбор ТП-177: проверяю отклонение температуры и качество данных. Дефект пока не подтверждаю."
+      ]
+    ],
+    "after": "На рассмотрении",
+    "say": "Это отдельное решение человека. Оно сохраняется с основанием и автором.",
+    "where": "Карточка случая → Инженерный вывод → Решение по случаю",
+    "seconds": 12
+  },
+  {
+    "name": "Запросить подтверждение",
+    "role": "engineer",
+    "screen": "decision",
+    "button": "Записать решение",
+    "fields": [
+      [
+        "Новое состояние",
+        "Ожидает доказательств"
+      ],
+      [
+        "Основание",
+        "Для учебного разбора нужна независимая проверка. Реальных измерений здесь нет."
+      ]
+    ],
+    "after": "Ожидает доказательств",
+    "say": "Это отдельное решение человека. Оно сохраняется с основанием и автором.",
+    "where": "Карточка случая → Инженерный вывод → Решение по случаю",
+    "seconds": 12
+  },
+  {
+    "name": "Открыть панель доказательств",
+    "role": "engineer",
+    "screen": "case",
+    "button": "Открыть записи",
+    "fields": [],
+    "after": "Панель «Доказательства»",
+    "say": "Материалы случая находятся в отдельной панели. Здесь я добавляю наблюдение.",
+    "where": "Справа «Доказательства и качество» → «Открыть записи»",
+    "seconds": 10
+  },
+  {
+    "name": "Добавить исходное наблюдение",
+    "role": "engineer",
+    "screen": "evidence",
+    "button": "Сохранить запись",
+    "fields": [
+      [
+        "Наблюдение",
+        "Учебное наблюдение: в синтетическом сценарии есть дополнительный нагрев. Требуется независимая проверка."
+      ],
+      [
+        "Основание добавления",
+        "Фиксирую исходное наблюдение для учебного разбора."
+      ]
+    ],
+    "after": "Запись добавлена · Не подтверждено",
+    "say": "Наблюдение описывает материал. Основание объясняет, зачем я его добавил.",
+    "where": "Боковая панель «Доказательства» → прокрутить до «Добавить заметку»",
+    "seconds": 14
+  },
+  {
+    "name": "Добавить учебный протокол",
+    "role": "engineer",
+    "screen": "evidence",
+    "button": "Сохранить запись",
+    "fields": [
+      [
+        "Наблюдение",
+        "Учебный протокол: по условию синтетического сценария независимая проверка подтвердила нагрев. Это вымышленные данные, не реальные измерения."
+      ],
+      [
+        "Основание добавления",
+        "Материал для демонстрации явного подтверждения человеком."
+      ]
+    ],
+    "after": "Учебный протокол добавлен",
+    "say": "Отделяю исходное наблюдение от результата проверки. Для репетиции результат явно задан как синтетический.",
+    "where": "Снова «Открыть записи» → «Добавить заметку»",
+    "seconds": 14
+  },
+  {
+    "name": "Подтвердить учебный случай",
+    "role": "engineer",
+    "screen": "decision",
+    "button": "Записать решение",
+    "fields": [
+      [
+        "Новое состояние",
+        "Подтвержден человеком"
+      ],
+      [
+        "Основание",
+        "Только учебный сценарий: принимаю синтетическое подтверждение нагрева. К реальному объекту вывод не относится."
+      ],
+      [
+        "Записи, на которых основано решение",
+        "☑ Учебный протокол"
+      ]
+    ],
+    "after": "Подтвержден человеком",
+    "say": "Это отдельное решение человека. Оно сохраняется с основанием и автором.",
+    "where": "Карточка случая → Инженерный вывод → Решение по случаю",
+    "seconds": 12
+  },
+  {
+    "name": "Создать проект проверки",
+    "role": "engineer",
+    "screen": "create",
+    "button": "Создать проект",
+    "fields": [
+      [
+        "Основание проекта",
+        "Учебный план: проверить причину отклонения и оформить подтверждающие материалы. Команд оборудованию нет."
+      ]
+    ],
+    "after": "Проект",
+    "say": "Из рекомендованных действий создаю проект. Это еще не согласованный план.",
+    "where": "Инженерный вывод → «Создать проект проверки»",
+    "seconds": 12
+  },
+  {
+    "name": "Уточнить шаги плана",
+    "role": "engineer",
+    "screen": "edit",
+    "button": "Сохранить проект",
+    "fields": [
+      [
+        "Срок, ч после согласования",
+        "48"
+      ],
+      [
+        "Нужные подтверждения, через запятую",
+        "Учебный протокол, Заключение исполнителя"
+      ],
+      [
+        "Основание изменения",
+        "Уточняю сроки и материалы для репетиции."
+      ]
+    ],
+    "after": "Проект сохранен",
+    "say": "Для каждого шага уточняю срок и нужные материалы. Ответственный уже задан как исполнитель.",
+    "where": "Ниже «Шаги проверки» → «Редактировать проект»; повторить для каждого шага",
+    "seconds": 14
+  },
+  {
+    "name": "Отправить план",
+    "role": "engineer",
+    "screen": "planDialog",
+    "button": "Записать решение",
+    "fields": [
+      [
+        "Основание",
+        "Передаю учебный проект. Состав проверок и сроки просмотрены."
+      ]
+    ],
+    "after": "На согласовании",
+    "say": "Проверяю материалы и явно записываю свое решение.",
+    "where": "Страница плана → Передать на согласование",
+    "seconds": 10
+  },
+  {
+    "name": "Войти: viewer",
+    "role": "viewer",
+    "screen": "login",
+    "button": "Войти",
+    "fields": [
+      [
+        "Пользователь",
+        "viewer"
+      ],
+      [
+        "Пароль",
+        "•••••••• (из локального infra/.env)"
+      ]
+    ],
+    "after": "Роль: viewer",
+    "say": "Работаю под отдельной ролью. Новая вкладка сама по себе пользователя не меняет.",
+    "where": "Справа сверху «Выйти» → форма входа → та же сохраненная ссылка",
+    "seconds": 10
+  },
+  {
+    "name": "Проверить ограничения наблюдателя",
+    "role": "viewer",
+    "screen": "viewer",
+    "button": "Просмотр плана",
+    "fields": [],
+    "after": "Кнопки «Согласовать» нет",
+    "say": "Наблюдатель видит план, но не принимает решение за согласующего.",
+    "where": "Открыть сохраненную ссылку плана; не создавать новый запуск",
+    "seconds": 10
+  },
+  {
+    "name": "Войти: approver",
+    "role": "approver",
+    "screen": "login",
+    "button": "Войти",
+    "fields": [
+      [
+        "Пользователь",
+        "approver"
+      ],
+      [
+        "Пароль",
+        "•••••••• (из локального infra/.env)"
+      ]
+    ],
+    "after": "Роль: approver",
+    "say": "Работаю под отдельной ролью. Новая вкладка сама по себе пользователя не меняет.",
+    "where": "Справа сверху «Выйти» → форма входа → та же сохраненная ссылка",
+    "seconds": 10
+  },
+  {
+    "name": "Согласовать проект",
+    "role": "approver",
+    "screen": "planDialog",
+    "button": "Записать решение",
+    "fields": [
+      [
+        "Основание",
+        "Согласую состав учебных проверок. Это не подтверждение дефекта и не разрешение на переключения."
+      ]
+    ],
+    "after": "Согласован",
+    "say": "Проверяю материалы и явно записываю свое решение.",
+    "where": "Страница плана → Согласовать",
+    "seconds": 10
+  },
+  {
+    "name": "Войти: engineer",
+    "role": "engineer",
+    "screen": "login",
+    "button": "Войти",
+    "fields": [
+      [
+        "Пользователь",
+        "engineer"
+      ],
+      [
+        "Пароль",
+        "•••••••• (из локального infra/.env)"
+      ]
+    ],
+    "after": "Роль: engineer",
+    "say": "Работаю под отдельной ролью. Новая вкладка сама по себе пользователя не меняет.",
+    "where": "Справа сверху «Выйти» → форма входа → та же сохраненная ссылка",
+    "seconds": 10
+  },
+  {
+    "name": "Зафиксировать планирование",
+    "role": "engineer",
+    "screen": "decision",
+    "button": "Записать решение",
+    "fields": [
+      [
+        "Новое состояние",
+        "Мероприятия запланированы"
+      ],
+      [
+        "Основание",
+        "Учебный план согласован. Фиксирую переход к мероприятиям."
+      ]
+    ],
+    "after": "Мероприятия запланированы",
+    "say": "Это отдельное решение человека. Оно сохраняется с основанием и автором.",
+    "where": "Карточка случая → Инженерный вывод → Решение по случаю",
+    "seconds": 12
+  },
+  {
+    "name": "Войти: technician",
+    "role": "technician",
+    "screen": "login",
+    "button": "Войти",
+    "fields": [
+      [
+        "Пользователь",
+        "technician"
+      ],
+      [
+        "Пароль",
+        "•••••••• (из локального infra/.env)"
+      ]
+    ],
+    "after": "Роль: technician",
+    "say": "Работаю под отдельной ролью. Новая вкладка сама по себе пользователя не меняет.",
+    "where": "Справа сверху «Выйти» → форма входа → та же сохраненная ссылка",
+    "seconds": 10
+  },
+  {
+    "name": "Начать выполнение",
+    "role": "technician",
+    "screen": "planDialog",
+    "button": "Записать решение",
+    "fields": [
+      [
+        "Основание",
+        "Начинаю учебную отработку шагов. Реальные работы на объекте не выполняются."
+      ]
+    ],
+    "after": "В работе",
+    "say": "Проверяю материалы и явно записываю свое решение.",
+    "where": "Страница плана → Начать выполнение",
+    "seconds": 10
+  },
+  {
+    "name": "Добавить материал исполнителя",
+    "role": "technician",
+    "screen": "evidence",
+    "button": "Сохранить запись",
+    "fields": [
+      [
+        "Наблюдение",
+        "Учебный результат исполнителя: подготовлены условия и выводы проверки. Реальных работ не было. Нужна проверка согласующим."
+      ],
+      [
+        "Основание добавления",
+        "Фиксация учебного результата по плану."
+      ]
+    ],
+    "after": "Материал добавлен · Не подтверждено",
+    "say": "Добавляю результат после начала выполнения. Выбор материала не изменяет его статус проверки.",
+    "where": "Вверху плана «Открыть диагностический случай» → «Открыть записи» → «Добавить заметку»",
+    "seconds": 14
+  },
+  {
+    "name": "Записать результат шага 1",
+    "role": "technician",
+    "screen": "result",
+    "button": "Сохранить результат",
+    "fields": [
+      [
+        "Заключение",
+        "Учебный шаг 1: «Запросить термографию». Результат оформлен для репетиции. Реальных измерений нет; нужна проверка согласующим."
+      ],
+      [
+        "Подтверждающие записи",
+        "☑ Учебный результат исполнителя · не проверено"
+      ]
+    ],
+    "after": "Шаг 1: Результат записан",
+    "say": "Записываю отдельный вывод по этому шагу и прикладываю относящийся к нему материал.",
+    "where": "Вернуться по ссылке плана → «Результаты шагов» → «Результат шага 1»",
+    "seconds": 14
+  },
+  {
+    "name": "Записать результат шага 2",
+    "role": "technician",
+    "screen": "result",
+    "button": "Сохранить результат",
+    "fields": [
+      [
+        "Заключение",
+        "Учебный шаг 2: «Рассмотреть инженеру». Результат оформлен для репетиции. Реальных измерений нет; нужна проверка согласующим."
+      ],
+      [
+        "Подтверждающие записи",
+        "☑ Учебный результат исполнителя · не проверено"
+      ]
+    ],
+    "after": "Шаг 2: Результат записан",
+    "say": "Записываю отдельный вывод по этому шагу и прикладываю относящийся к нему материал.",
+    "where": "Вернуться по ссылке плана → «Результаты шагов» → «Результат шага 2»",
+    "seconds": 14
+  },
+  {
+    "name": "Передать все результаты",
+    "role": "technician",
+    "screen": "planDialog",
+    "button": "Записать решение",
+    "fields": [
+      [
+        "Основание",
+        "Учебные результаты каждого шага записаны. Передаю на независимую проверку."
+      ]
+    ],
+    "after": "Ожидает проверки",
+    "say": "Проверяю материалы и явно записываю свое решение.",
+    "where": "Страница плана → Передать на проверку",
+    "seconds": 10
+  },
+  {
+    "name": "Войти: approver",
+    "role": "approver",
+    "screen": "login",
+    "button": "Войти",
+    "fields": [
+      [
+        "Пользователь",
+        "approver"
+      ],
+      [
+        "Пароль",
+        "•••••••• (из локального infra/.env)"
+      ]
+    ],
+    "after": "Роль: approver",
+    "say": "Работаю под отдельной ролью. Новая вкладка сама по себе пользователя не меняет.",
+    "where": "Справа сверху «Выйти» → форма входа → та же сохраненная ссылка",
+    "seconds": 10
+  },
+  {
+    "name": "Проверить и завершить план",
+    "role": "approver",
+    "screen": "planDialog",
+    "button": "Записать решение",
+    "fields": [
+      [
+        "Основание",
+        "Просмотрены результаты всех шагов и приложенные материалы. Завершаю учебную проверку плана."
+      ]
+    ],
+    "after": "Выполнен · шаги Проверен",
+    "say": "Проверяю материалы и явно записываю свое решение.",
+    "where": "Страница плана → Записать завершение",
+    "seconds": 10
+  },
+  {
+    "name": "Войти: engineer",
+    "role": "engineer",
+    "screen": "login",
+    "button": "Войти",
+    "fields": [
+      [
+        "Пользователь",
+        "engineer"
+      ],
+      [
+        "Пароль",
+        "•••••••• (из локального infra/.env)"
+      ]
+    ],
+    "after": "Роль: engineer",
+    "say": "Работаю под отдельной ролью. Новая вкладка сама по себе пользователя не меняет.",
+    "where": "Справа сверху «Выйти» → форма входа → та же сохраненная ссылка",
+    "seconds": 10
+  },
+  {
+    "name": "Перейти к итоговой проверке",
+    "role": "engineer",
+    "screen": "decision",
+    "button": "Записать решение",
+    "fields": [
+      [
+        "Новое состояние",
+        "Проверка результата"
+      ],
+      [
+        "Основание",
+        "План выполнен и проверен согласующим. Перехожу к итоговой проверке случая."
+      ]
+    ],
+    "after": "Проверка результата",
+    "say": "Это отдельное решение человека. Оно сохраняется с основанием и автором.",
+    "where": "Карточка случая → Инженерный вывод → Решение по случаю",
+    "seconds": 12
+  },
+  {
+    "name": "Войти: approver",
+    "role": "approver",
+    "screen": "login",
+    "button": "Войти",
+    "fields": [
+      [
+        "Пользователь",
+        "approver"
+      ],
+      [
+        "Пароль",
+        "•••••••• (из локального infra/.env)"
+      ]
+    ],
+    "after": "Роль: approver",
+    "say": "Работаю под отдельной ролью. Новая вкладка сама по себе пользователя не меняет.",
+    "where": "Справа сверху «Выйти» → форма входа → та же сохраненная ссылка",
+    "seconds": 10
+  },
+  {
+    "name": "Закрыть случай",
+    "role": "approver",
+    "screen": "decision",
+    "button": "Записать решение",
+    "fields": [
+      [
+        "Новое состояние",
+        "Закрыт"
+      ],
+      [
+        "Основание",
+        "Учебный план выполнен, результаты проверены. Закрываю демонстрационный случай, не реальный объект."
+      ],
+      [
+        "Записи, на которых основано решение",
+        "☑ Учебный результат исполнителя"
+      ]
+    ],
+    "after": "Закрыт",
+    "say": "Это отдельное решение человека. Оно сохраняется с основанием и автором.",
+    "where": "Карточка случая → Инженерный вывод → Решение по случаю",
+    "seconds": 12
+  },
+  {
+    "name": "Показать историю",
+    "role": "approver",
+    "screen": "history",
+    "button": "Ход рассмотрения",
+    "fields": [],
+    "after": "Автор и основание каждого решения",
+    "say": "История позволяет объяснить, кто добавил материал, кто согласовал план и кто закрыл случай.",
+    "where": "Карточка случая → прокрутить вниз до «Ход рассмотрения»",
+    "seconds": 10
+  },
+  {
+    "name": "Сохранить результат показа",
+    "role": "approver",
+    "screen": "case",
+    "button": "Экспорт JSON",
+    "fields": [],
+    "after": "JSON с режимом, временем и версиями",
+    "say": "Экспорт сохраняет контекст данных. Рядом есть «Печать» для печатного представления.",
+    "where": "Вверху карточки случая → «Экспорт JSON»",
+    "seconds": 10
+  },
+  {
+    "name": "Автоматические проверки",
+    "role": "Проверка",
+    "screen": "terminal",
+    "button": "Выполнить в Терминале",
+    "fields": [
+      [
+        "Команды",
+        "uv sync --frozen\nuv run --frozen python scripts/smoke_local.py\nuv run --frozen python scripts/check_live_workflow.py"
+      ]
+    ],
+    "after": "Ожидается завершение без ошибок",
+    "say": "Это проверки локального прототипа. Live-тест создает учебные записи; это не промышленная валидация.",
+    "where": "Нужен uv; выполнять при запущенном приложении",
+    "seconds": 14
+  },
+  {
+    "name": "Остановить с сохранением данных",
+    "role": "Завершение",
+    "screen": "terminal",
+    "button": "Выполнить в Терминале",
+    "fields": [
+      [
+        "Команда",
+        "docker compose --env-file infra/.env -p energy-diagnostics -f infra/compose.yaml stop"
+      ]
+    ],
+    "after": "Данные сохранены",
+    "say": "Для нового показа создаю новый SIMULATION run. Старую историю не удаляю.",
+    "where": "Не применять down -v. Для повторного запуска использовать up.",
+    "seconds": 12
+  }
+];
+const params=new URLSearchParams(location.search),FPS=30,seed=Number(params.get('s')||7),width=Math.max(320,Math.min(2560,Number(params.get('w')||1280)));
+const ar=(params.get('ar')||'16:9').split(':').map(Number),ratio=ar.length===2&&ar.every(v=>v>0&&Number.isFinite(v))?ar[0]/ar[1]:16/9;
+let offset=0;const plates=scenes.map(s=>{const p={name:s.name,len:s.seconds*FPS,start:offset};offset+=p.len;return p;});const TOTAL=offset;
+const palette={nav:'#0b3556',blue:'#0069b4',ink:'#17334d',muted:'#52677a',bg:'#f3f7fa',border:'#d6e2ec',green:'#0e6b4a'};
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));const ease=t=>1-Math.pow(1-clamp(t),3);
+function rng(n){let x=n|0;return()=>{x^=x<<13;x^=x>>>17;x^=x<<5;return(x>>>0)/4294967296;};}
+function box(c,x,y,w,h,fill,stroke,r=6){c.beginPath();c.roundRect(x,y,w,h,r);c.fillStyle=fill;c.fill();if(stroke){c.lineWidth=1;c.strokeStyle=stroke;c.stroke();}}
+function txt(c,t,x,y,size=18,color=palette.ink,bold=false){c.fillStyle=color;c.font=`${bold?600:400} ${size}px system-ui,sans-serif`;c.fillText(t,x,y);}
+function wrap(c,t,x,y,w,size=18,color=palette.ink,max=9){c.font=`400 ${size}px system-ui,sans-serif`;c.fillStyle=color;let lines=[];for(const raw of String(t).split('\n')){let line='';for(const word of raw.split(' ')){if(c.measureText(line+word).width>w&&line){lines.push(line.trim());line='';}if(c.measureText(word).width>w){for(const char of word){if(c.measureText(line+char).width>w){lines.push(line);line='';}line+=char;}line+=' ';}else line+=word+' ';}lines.push(line.trim());}lines.slice(0,max).forEach((v,i)=>c.fillText(i===max-1&&lines.length>max?v.slice(0,-3)+'…':v,x,y+i*(size*1.35)));return lines.length;}
+function button(c,label,x,y,w=220,highlight=false){box(c,x,y,w,38,highlight?'#00558f':palette.blue);txt(c,label,x+13,y+25,15,'#fff',true);return{x:x+w*.68,y:y+22};}
+function cursor(c,p,t){c.save();c.translate(p.x,p.y);c.beginPath();c.moveTo(0,0);c.lineTo(0,25);c.lineTo(7,19);c.lineTo(13,30);c.lineTo(18,27);c.lineTo(12,17);c.lineTo(23,16);c.closePath();c.fillStyle=palette.ink;c.fill();c.strokeStyle='#fff';c.lineWidth=2;c.stroke();if(t>.72&&t<.84){c.beginPath();c.arc(0,0,10+(t-.72)*100,0,7);c.strokeStyle=palette.blue;c.lineWidth=3;c.stroke();}c.restore();}
+function locate(n){return plates.findIndex(p=>n>=p.start&&n<p.start+p.len);}
+function draw(canvas,n,w=1280,sd=seed){n=Math.round(clamp(n,0,TOTAL-1));const index=locate(n),s=scenes[index],t=(n-plates[index].start)/(plates[index].len-1),done=t>=.84;
+ canvas.width=w;canvas.height=Math.round(w/ratio);const c=canvas.getContext('2d');c.fillStyle=palette.bg;c.fillRect(0,0,canvas.width,canvas.height);const scale=Math.min(w/1280,canvas.height/720);c.translate((w-1280*scale)/2,(canvas.height-720*scale)/2);c.scale(scale,scale);
+ const noise=rng(sd||1);for(let i=0;i<160;i++){c.fillStyle='#17334d06';c.fillRect(noise()*1280,noise()*720,1,1);}
+ txt(c,'ЭНЕРГОДИАГНОСТИКА',24,32,14,palette.nav,true);txt(c,`${String(index+1).padStart(2,'0')} / ${scenes.length}   ${s.name}`,24,70,29,palette.ink,true);
+ box(c,20,101,840,550,'#fff',palette.border);box(c,20,101,140,550,palette.nav,null,0);txt(c,'Советчик',35,132,17,'#fff',true);txt(c,'DEMO',35,155,12,'#b7d4e8');['Обзор активов','Диагностика','Очередь рисков','Задания ТОиР','Модели и данные'].forEach((v,i)=>{if((s.screen==='queue'&&i===2)||(s.screen.includes('plan')&&i===3))box(c,28,185+i*39,123,32,palette.blue);txt(c,v,35,206+i*39,12,'#fff');});txt(c,'Без команд в сеть',35,625,11,'#b7d4e8');
+ txt(c,`Роль: ${s.role}`,181,129,14,palette.ink,true);txt(c,'Выйти',797,129,13,palette.blue);box(c,161,145,699,32,'#eaf3f9',null,0);txt(c,(['terminal','docker','login'].includes(s.screen)||(s.screen==='scenario'&&!done))?'DEMO · учебная схема интерфейса':'SIMULATION · синтетические данные · июль 2026',180,166,12,palette.blue,true);
+ let target={x:760,y:570};const form=['decision','create','edit','evidence','result','planDialog','login','scenario'].includes(s.screen);
+ if(s.screen==='terminal'){box(c,180,192,660,378,palette.nav);txt(c,'ТЕРМИНАЛ',200,220,14,'#b7d4e8',true);wrap(c,s.fields[0][1].slice(0,Math.ceil(s.fields[0][1].length*clamp(t/.68))),200,264,610,20,'#fff',10);target=button(c,'Enter',690,588,130,t>.72);}
+ else if(s.screen==='docker'){txt(c,'Docker Desktop',200,226,28,palette.ink,true);box(c,220,277,580,185,'#f3f7fa',palette.border);txt(c,done?'Engine running':t<.2?'Откройте приложение':'Запуск движка…',250,338,27,done?palette.green:palette.blue,true);box(c,250,380,510,6,palette.border);box(c,250,380,510*ease(t/.8),6,done?palette.green:palette.blue);target=button(c,'Открыть Docker Desktop',460,507,300,t>.72);}
+ else if(form){const title=s.screen==='evidence'?'Доказательства · Добавить заметку':s.screen==='decision'?'Решение по случаю':s.screen==='result'?'Записать результат проверки':s.screen==='create'?'Проект проверочных мероприятий':s.screen==='edit'?'Редактировать проект':s.screen==='login'?'Вход в демонстрационный контур':s.screen==='scenario'?'Синтетический расчет':s.where.split(' → ').at(-1);
+ box(c,180,190,660,435,'#fff',palette.border);wrap(c,title,200,220,610,21,palette.ink,2);let y=251;
+ const rows=s.fields,available=286,unit=Math.min(132,available/Math.max(1,rows.length));
+ rows.forEach(([label,value],j)=>{txt(c,label,200,y,14,palette.muted,true);const isChoice=value.startsWith('☑'),progress=clamp((t-.12-j*.10)/.38),visible=value.slice(0,Math.ceil(value.length*progress));box(c,200,y+10,620,unit-29,isChoice?'#edf4fa':'#f8fafc',palette.border);wrap(c,visible,212,y+33,593,16,palette.ink,Math.max(1,Math.floor((unit-36)/21.6)));y+=unit;});
+ target=button(c,s.button,530,573,290,t>.72);
+ }
+ else if(s.screen==='queue'){txt(c,'Очередь рисков',180,220,27,palette.ink,true);txt(c,'Объект                 Приоритет             Следующий шаг',190,264,16,palette.muted);['ТП-177 / Т-1','ТП-309','ТП-306'].forEach((v,i)=>{box(c,180,282+i*72,660,59,i===0?'#eaf3fa':'#f8fafc',palette.border);txt(c,v,195,316+i*72,20,palette.blue,true);txt(c,i===2?'Неизвестно':'Требует проверки',402,316+i*72,15);txt(c,'Открыть случай →',629,316+i*72,14,palette.blue);});target={x:284,y:310};}
+ else if(s.screen==='viewer'){txt(c,'План проверки · ТП-177',185,220,25,palette.ink,true);txt(c,'На согласовании',185,255,18);box(c,185,280,650,210,'#f8fafc',palette.border);txt(c,'Шаги проверки',205,311,19,palette.ink,true);txt(c,'1. Запросить термографию',205,355,18);txt(c,'2. Рассмотреть инженеру',205,394,18);txt(c,'Кнопка «Согласовать» отсутствует',205,447,19,palette.muted);target={x:808,y:129};}
+ else if(s.screen==='history'){txt(c,'Ход рассмотрения',185,221,26,palette.ink,true);['Инженер · На рассмотрении','Инженер · Добавлена запись','Согласующий · Согласован','Исполнитель · Записан результат шага','Согласующий · Выполнен','Согласующий · Закрыт'].forEach((v,i)=>{box(c,187,248+i*49,646,40,i===5&&done?'#e7f5ed':'#f3f7fa');txt(c,v,200,275+i*49,16);});target={x:736,y:514};}
+ else{txt(c,'ТП-177 / Т-1',182,216,26,palette.ink,true);txt(c,'Диагностический случай',182,240,14,palette.muted);box(c,180,262,350,241,'#f8fafc',palette.border);txt(c,'Температура с поправкой',194,285,16,palette.ink,true);txt(c,'на нагрузку',194,307,16,palette.ink,true);for(let k=0;k<2;k++){c.beginPath();for(let x=0;x<=298;x+=3){let y=382+Math.sin(x/38)*29+k*31;c.lineTo(200+x,y);}c.strokeStyle=k?palette.blue:'#c65d00';c.lineWidth=2;c.stroke();}txt(c,'Схематичный график',195,473,12,palette.muted);
+ box(c,550,262,289,140,'#fff',palette.border);txt(c,'Доказательства и качество',563,288,16,palette.ink,true);const ev=button(c,'Открыть записи',566,341,255,s.button==='Открыть записи'&&t>.72);box(c,550,418,289,154,'#fff',palette.border);txt(c,'Инженерный вывод',564,445,18,palette.ink,true);wrap(c,'Гипотеза, а не автоматически подтвержденный дефект',564,476,254,15,palette.muted,3);const dec=button(c,'Решение по случаю',566,525,255);
+ if(s.button==='Открыть записи')target=ev;else if(s.button==='Экспорт JSON')target=button(c,'Экспорт JSON',666,194,173,t>.72);else if(s.button==='Остаток')target=button(c,'Остаток',359,523,170,t>.72);else target=dec;}
+ if(done){box(c,180,590,660,47,'#e7f5ed');wrap(c,'✓ '+s.after,195,619,630,17,palette.green,1);}
+ const from={x:350,y:631},p={x:from.x+(target.x-from.x)*ease(t/.68),y:from.y+(target.y-from.y)*ease(t/.68)};if(!done)cursor(c,p,t);
+ box(c,888,101,372,550,'#fff',palette.border);txt(c,'КУДА НАЖАТЬ',908,135,12,palette.blue,true);wrap(c,s.where,908,167,328,18,palette.ink,6);txt(c,'ЧТО СКАЗАТЬ',908,343,12,palette.blue,true);wrap(c,s.say,908,376,328,20,palette.ink,8);
+ txt(c,'Учебная схема · не скринкаст · все примеры синтетические',24,682,13,palette.muted);txt(c,'Тексты для ввода находятся под плеером',893,682,12,palette.muted);box(c,20,703,1240,4,palette.border);box(c,20,703,1240*t,4,palette.blue);return canvas;
+}
+function frame(n,w=1280,sd=seed){return draw(document.createElement('canvas'),n,w,sd).toDataURL('image/png');}
+function contact(count=24,cw=320){count=Math.round(clamp(count,1,120));const cols=4,ch=Math.round(cw/ratio),canvas=document.createElement('canvas');canvas.width=cols*cw;canvas.height=Math.ceil(count/cols)*(ch+27);const c=canvas.getContext('2d');c.fillStyle='#d6e2ec';c.fillRect(0,0,canvas.width,canvas.height);for(let i=0;i<count;i++){const n=Math.round(i*(TOTAL-1)/Math.max(1,count-1)),x=i%cols*cw,y=Math.floor(i/cols)*(ch+27);c.drawImage(draw(document.createElement('canvas'),n,cw,seed),x,y);txt(c,`${locate(n)+1} · f=${n}`,x+7,y+ch+18,12);}return canvas.toDataURL();}
+window.RISO={get total(){return TOTAL},frame,contact,plates};
+const $=id=>document.getElementById(id),screen=$('screen'),seek=$('seek'),selector=$('scene');let current=Math.round(clamp(Number(params.get('f')||0),0,TOTAL-1)),mode='paused',last=0,shown=-1;
+seek.min=0;seek.max=TOTAL-1;plates.forEach((p,i)=>{const o=document.createElement('option');o.value=i;o.textContent=`${i+1}. ${p.name}`;selector.append(o);});
+function show(){const i=locate(current),s=scenes[i];draw(screen,current,width,seed);seek.value=current;selector.value=i;$('time').textContent=`${(current/FPS).toFixed(1)} / ${(TOTAL/FPS).toFixed(0)} с`;$('prev').disabled=i===0;$('next').disabled=i===scenes.length-1;$('play').textContent=mode==='auto'?'Пауза':'Автопоказ';if(shown!==i){shown=i;$('stepTitle').textContent=`Шаг ${i+1}. ${s.name}`;$('where').textContent=s.where;$('speech').textContent=s.say;$('outcome').textContent=s.after;$('role').textContent='Пользователь: '+s.role;$('fields').replaceChildren();for(const [label,value] of s.fields){const p=document.createElement('p'),b=document.createElement('strong');b.textContent=label+': ';p.append(b,document.createTextNode(value));$('fields').append(p);}}}
+function go(i){i=Math.round(clamp(i,0,plates.length-1));current=plates[i].start;last=0;mode=matchMedia('(prefers-reduced-motion: reduce)').matches?'paused':'step';if(mode==='paused')current+=plates[i].len-1;show();}
+$('prev').onclick=()=>go(locate(current)-1);$('next').onclick=()=>go(locate(current)+1);$('repeat').onclick=()=>go(locate(current));selector.onchange=()=>go(Number(selector.value));$('play').onclick=()=>{if(mode==='auto'){mode='paused';}else{if(current===TOTAL-1)current=0;mode='auto';last=0;}show();};seek.oninput=()=>{mode='paused';current=Number(seek.value);show();};
+function tick(ts){if(mode!=='paused'){if(!last)last=ts;let delta=Math.floor((ts-last)*FPS/1000);if(delta>0){const p=plates[locate(current)],limit=mode==='step'?p.start+p.len-1:TOTAL-1;current=Math.min(current+delta,limit);last+=delta*1000/FPS;if(current===limit)mode='paused';show();}}requestAnimationFrame(tick);}
+if(params.has('grid')){const im=new Image();im.onload=()=>{screen.width=im.width;screen.height=im.height;screen.getContext('2d').drawImage(im,0,0);document.querySelectorAll('nav').forEach(n=>n.hidden=true);$('notes').hidden=true;window.__ready=true;};im.src=contact(Number(params.get('grid'))||24);}else{show();window.__ready=true;requestAnimationFrame(tick);}
+</script></html>
