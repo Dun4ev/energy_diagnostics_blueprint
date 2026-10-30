@@ -1,0 +1,9 @@
+{
+  "name": "energy-explainer",
+  "title": "ЭнергоДиагностика: путь от сигнала к решению",
+  "style": "isometric",
+  "format": { "width": 1920, "height": 1080, "fps": 24, "bpm": 120, "duration": 112, "frames": 2688 },
+  "storyFormat": "guided product walkthrough",
+  "build": ["src/head.html", "kit/core.js", "style", "src/scenes.js", "src/bridges.js", "kit/morph.js", "kit/board.js", "kit/score-head.js", "src/score.js", "kit/score-tail.js"],
+  "review": { "safe": { "top": 30, "bottom": 30, "right": 30 }, "deadMax": 8, "refs": {} }
+}

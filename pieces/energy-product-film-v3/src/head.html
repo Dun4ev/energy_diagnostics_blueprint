@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ЭнергоДиагностика: продуктовая презентация</title>
+<style>html,body{margin:0;height:100%;background:#06182a}body{display:flex;align-items:center;justify-content:center}canvas{width:min(100vw,177.78vh);height:auto;display:block}</style>
+</head><body><canvas id="c" width="1920" height="1080"></canvas><script>
+"use strict";
+const FPS=24,W=1920,H=1080,BPM=115,BEAT=60/BPM,E8=BEAT/2,E16=BEAT/4,GRID0=.511;
+const DURATION=68,NFRAMES=DURATION*FPS,LOOP_T=DURATION,SAFE={top:30,bottom:30,right:30},CX=W/2;
+const HAND='"Segoe UI", Arial, sans-serif';
+// The frames below are a proposed product-presentation storyboard, not a tutorial.
+const SHOTS=[
+ {at:0,title:'ЭнергоДиагностика',light:false},
+ {at:5,title:'Данные. Контекст. Решение.',light:false},
+ {at:10,title:'Картина оборудования',light:true},
+ {at:15,title:'Отклонение в контексте',light:false},
+ {at:21,title:'Приоритет внимания',light:true},
+ {at:26,title:'Качество данных',light:false},
+ {at:32,title:'Обоснование и гипотеза',light:false},
+ {at:38,title:'От анализа к плану',light:true},
+ {at:44,title:'Роли и согласование',light:false},
+ {at:50,title:'История решений',light:true},
+ {at:56,title:'Что получает команда',light:false},
+ {at:63,title:'Решение за человеком',light:false}
+];
+// Place scene boundaries on the music's eighth-note grid and an exact frame.
+for(let i=1;i<SHOTS.length;i++)SHOTS[i].at=Math.round((GRID0+Math.round((SHOTS[i].at-GRID0)/E8)*E8)*FPS)/FPS;
+const ERA_LIST=SHOTS.map((s,i)=>[s.at,i+1<SHOTS.length?SHOTS[i+1].at:DURATION,()=>productScene(i)]);
+const TIMELINE={width:W,height:H,fps:FPS,bpm:BPM,duration:DURATION,frames:NFRAMES,loop:LOOP_T,safe:SAFE,format:'product-presentation',gridOffset:GRID0,
+ shots:SHOTS.map((s,i)=>({id:i+1,key:`product-${i+1}`,era:i,t0:s.at,t1:i+1<SHOTS.length?SHOTS[i+1].at:DURATION,title:s.title})),
+ cuts:SHOTS.slice(1).map(s=>s.at),morphs:[],cues:{},acts:[{name:'Продукт',role:'process',t0:0,t1:DURATION}],
+ board:SHOTS.map((s,i)=>({t:s.at+1.5,title:s.title,sound:'',next:i+1<SHOTS.length?SHOTS[i+1].title:'завершение'})),narration:[]};
+window.TIMELINE=TIMELINE;

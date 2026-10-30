@@ -1,6 +1,6 @@
 # Energy diagnostics prototype — repository rules
 
-Read this file first. Source of visual truth: `design.md`; source of numerical semantics: `docs/diagnostics.md`; contract policy: `contracts/README.md`. This repository is a blueprint plus synthetic fixtures, NOT a finished application.
+Read this file first. Source of visual truth: `DESIGN.md`; source of numerical semantics: `docs/diagnostics.md`; contract policy: `contracts/README.md`. This repository is a blueprint plus synthetic fixtures, NOT a finished application.
 
 ## Non-negotiable invariants
 
@@ -21,7 +21,7 @@ Use the exact prompt for the current stage from `prompts/`. Respect OWNED/READ-O
 
 Start with stage00 read-only inventory. Stage01 freezes full contracts and creates executable build/test skeleton before parallel features. Each agent uses a separate worktree and reports its base commit. Do not reset or clean unrelated user changes.
 
-For UI work read `design.md` and visually inspect `references/slide-29.png`. Use one main design skill; domain brief overrides decorative defaults. For core work read diagnostics/data-spec and contract schemas. For QA read acceptance and inspect both errors and happy paths.
+For UI work read `DESIGN.md` and visually inspect `references/slide-29.png`. Use one main design skill; domain brief overrides decorative defaults. For core work read diagnostics/data-spec and contract schemas. For QA read acceptance and inspect both errors and happy paths.
 
 Keep context small: use schemas, bounded examples and relevant sections rather than dumping whole CSV/PDF into every session. Test fixture generator and code through scripts. No hidden installs, broad permission changes, or automatic network/deployment steps.
 

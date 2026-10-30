@@ -1,0 +1,10 @@
+{
+  "name": "energy-product-film-v3",
+  "title": "ЭнергоДиагностика: презентация продукта",
+  "style": "isometric",
+  "format": { "width": 1920, "height": 1080, "fps": 24, "bpm": 115, "duration": 68, "frames": 1632 },
+  "storyFormat": "product-presentation",
+  "music": { "file": "audio/elevenlabs-score.mp3", "start": 0, "gain": 0, "fade": 0.7 },
+  "build": ["src/head.html", "kit/core.js", "style", "src/series.js", "src/scenes.js", "src/bridges.js", "kit/morph.js", "kit/board.js", "kit/score-head.js", "src/score.js", "kit/score-tail.js"],
+  "review": { "safe": { "top": 30, "bottom": 30, "right": 30 }, "deadMax": 8, "refs": {} }
+}

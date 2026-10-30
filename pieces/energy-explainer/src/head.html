@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ЭнергоДиагностика: путь от сигнала к решению</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #f3f7fa; }
+  body { display: flex; align-items: center; justify-content: center; }
+  canvas { width: min(100vw, 177.78vh); height: auto; display: block; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+"use strict";
+// Approved 16:9 walkthrough. Screenshots are from the local synthetic demo.
+const FPS = 24, W = 1920, H = 1080, BPM = 120, BEAT = 60 / BPM, E8 = BEAT / 2, E16 = BEAT / 4;
+const DURATION = 112, NFRAMES = DURATION * FPS, LOOP_T = DURATION;
+const SAFE = { top: 30, bottom: 30, right: 30 }, CX = W / 2;
+const HAND = '"Segoe UI", Arial, sans-serif';
+const STEPS = [
+  { title: 'От сигнала к решению', body: 'ПО помогает выбрать сигнал, проверить данные и сохранить решение.', img: '01-overview.png', mode: 'ЗАПИСЬ СТЕНДА' },
+  { title: 'Управляйте показом', body: '«Продолжить» запускает запись, «Далее» меняет эпизод.', img: '01-overview.png', mode: 'ЗАПИСЬ СТЕНДА', focus: [125, 800, 210, 62], action: true },
+  { title: 'Продолжите с ведущим', body: 'Инженер открывает отдельный учебный запуск.', img: '03-deviation.png', mode: 'ЗАПИСЬ СТЕНДА', focus: [1310, 800, 250, 65], action: true },
+  { title: 'Откроется случай', body: 'Для выбранного эпизода открыт ТП-177 / Т-1.', img: '10-case-top.png', mode: 'РАБОЧИЙ ЭКРАН', focus: [245, 236, 580, 92] },
+  { title: 'Откройте очередь', body: 'Выберите «Очередь рисков» в меню приложения.', img: '09-queue.png', mode: 'РАБОЧИЙ ЭКРАН', focus: [8, 235, 210, 55], action: true },
+  { title: 'Сравните температуру', body: 'График сопоставляет измерение и ожидаемый режим.', img: '03-deviation.png', mode: 'ЗАПИСЬ СТЕНДА', focus: [815, 252, 702, 388] },
+  { title: 'Проверьте гипотезу', body: 'Гипотеза требует подтверждения данными.', img: '04-hypothesis.png', mode: 'ЗАПИСЬ СТЕНДА' },
+  { title: 'Изучите материалы', body: 'Учебные записи содержат время и происхождение.', img: '05-evidence.png', mode: 'ЗАПИСЬ СТЕНДА' },
+  { title: 'Откройте форму', body: 'Нажмите «Создать проект проверки», затем укажите основание.', img: '13-case-actions.png', mode: 'РАБОЧИЙ ЭКРАН', focus: [1240, 312, 200, 55], action: true, afterImg: '14-plan-dialog.jpg', afterFocus: [536, 490, 528, 100] },
+  { title: 'Подготовьте план', body: 'Инженер составляет проект проверочных шагов.', img: '06-plan.png', mode: 'ПОДГОТОВЛЕННАЯ ИСТОРИЯ' },
+  { title: 'Согласуйте решение', body: 'Согласующий рассматривает проект отдельно от исполнителя.', img: '07-approval.png', mode: 'ПОДГОТОВЛЕННАЯ ИСТОРИЯ' },
+  { title: 'Зафиксируйте результат', body: 'Исполнитель вносит результат проверки в учебном запуске.', img: '12-work-plan.png', mode: 'ДРУГОЙ УЧЕБНЫЙ ЗАПУСК' },
+  { title: 'Посмотрите историю', body: 'Действия и решения участников остаются в истории.', img: '08-history.png', mode: 'ПОДГОТОВЛЕННАЯ ИСТОРИЯ' },
+  { title: 'Решение за человеком', body: 'Прототип помогает разбирать сигналы и не управляет оборудованием.', img: '01-overview.png', mode: 'ЗАПИСЬ СТЕНДА' }
+];
+const ERA_LIST = STEPS.map((step, i) => [i * 8, (i + 1) * 8, () => sceneStill(i)]);
+const TIMELINE = {
+  width: W, height: H, fps: FPS, bpm: BPM, duration: DURATION, frames: NFRAMES, loop: LOOP_T, safe: SAFE,
+  format: 'guided-walkthrough',
+  shots: STEPS.map((step, i) => ({ id: i + 1, key: `step-${i + 1}`, era: i, t0: i * 8, t1: (i + 1) * 8, title: step.title })),
+  cuts: [...STEPS.slice(1).map((_, i) => (i + 1) * 8), 68].sort((a, b) => a - b), morphs: [], cues: {},
+  acts: [{ name: 'Учебный разбор', role: 'process', t0: 0, t1: DURATION }],
+  board: STEPS.map((step, i) => ({ t: i * 8 + 4, title: step.title, sound: '', next: i < STEPS.length - 1 ? STEPS[i + 1].title : 'завершение' })),
+  narration: []
+};
+window.TIMELINE = TIMELINE;

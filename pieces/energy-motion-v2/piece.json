@@ -1,0 +1,10 @@
+{
+  "name": "energy-motion-v2",
+  "title": "ЭнергоДиагностика: от сигнала к решению",
+  "style": "isometric",
+  "format": { "width": 1920, "height": 1080, "fps": 24, "bpm": 115, "duration": 90, "frames": 2160 },
+  "storyFormat": "product walkthrough",
+  "music": { "file": "audio/elevenlabs-score.mp3", "start": 0, "gain": 0, "fade": 0.6 },
+  "build": ["src/head.html", "kit/core.js", "style", "src/scenes.js", "src/bridges.js", "kit/morph.js", "kit/board.js", "kit/score-head.js", "src/score.js", "kit/score-tail.js"],
+  "review": { "safe": { "top": 30, "bottom": 30, "right": 30 }, "deadMax": 8, "refs": {} }
+}

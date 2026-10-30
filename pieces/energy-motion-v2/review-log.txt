@@ -1,0 +1,58 @@
+shot 1 (ОТ СИГНАЛА К РЕШЕНИЮ ИНЖЕНЕРА.): 20 frames [0,6,12,18,24,30,36,42,48,54,60,66,72,78,84,90,96,102,108,114] -> review/shot01-sheet.jpg
+shot 2 (НАЧНИТЕ С ПОКАЗА.): 20 frames [119,125,131,137,143,149,155,161,167,173,179,185,191,197,203,209,215,221,227,233] -> review/shot02-sheet.jpg
+shot 3 (ВСЕ АКТИВЫ НА ОДНОМ ЭКРАНЕ.): 21 frames [238,244,250,256,262,268,274,280,286,292,298,304,310,316,322,328,334,340,346,352,358] -> review/shot03-sheet.jpg
+shot 4 (ЧТО ТРЕБУЕТ ВНИМАНИЯ?): 20 frames [363,369,375,381,387,393,399,405,411,417,423,429,435,441,447,453,459,465,471,477] -> review/shot04-sheet.jpg
+shot 5 (РАЗБОР ПО ОБЪЕКТУ.): 20 frames [482,488,494,500,506,512,518,524,530,536,542,548,554,560,566,572,578,584,590,596] -> review/shot05-sheet.jpg
+shot 6 (ИЗМЕРЕНО И ОЖИДАЛОСЬ.): 24 frames [601,607,613,619,625,631,637,643,649,655,661,667,673,679,685,691,697,703,709,715,721,727,733,739] -> review/shot06-sheet.jpg
+shot 7 (КАЧЕСТВО ДАННЫХ ИМЕЕТ ЗНАЧЕНИЕ.): 20 frames [745,751,757,763,769,775,781,787,793,799,805,811,817,823,829,835,841,847,853,859] -> review/shot07-sheet.jpg
+shot 8 (ГИПОТЕЗА НЕ РАВНА ДЕФЕКТУ.): 20 frames [864,870,876,882,888,894,900,906,912,918,924,930,936,942,948,954,960,966,972,978] -> review/shot08-sheet.jpg
+shot 9 (ПРОВЕРЬТЕ ДОКАЗАТЕЛЬСТВА.): 24 frames [983,989,995,1001,1007,1013,1019,1025,1031,1037,1043,1049,1055,1061,1067,1073,1079,1085,1091,1097,1103,1109,1115,1121] -> review/shot09-sheet.jpg
+shot 10 (СОЗДАЙТЕ ПРОЕКТ ПРОВЕРКИ.): 20 frames [1127,1133,1139,1145,1151,1157,1163,1169,1175,1181,1187,1193,1199,1205,1211,1217,1223,1229,1235,1241] -> review/shot10-sheet.jpg
+shot 11 (ПЛАН С КОНКРЕТНЫМИ ШАГАМИ.): 24 frames [1246,1252,1258,1264,1270,1276,1282,1288,1294,1300,1306,1312,1318,1324,1330,1336,1342,1348,1354,1360,1366,1372,1378,1384] -> review/shot11-sheet.jpg
+shot 12 (СОГЛАСОВАНИЕ ПО РОЛЯМ.): 24 frames [1390,1396,1402,1408,1414,1420,1426,1432,1438,1444,1450,1456,1462,1468,1474,1480,1486,1492,1498,1504,1510,1516,1522,1528] -> review/shot12-sheet.jpg
+shot 13 (РЕЗУЛЬТАТ ПРОВЕРКИ ЗАФИКСИРОВАН.): 24 frames [1534,1540,1546,1552,1558,1564,1570,1576,1582,1588,1594,1600,1606,1612,1618,1624,1630,1636,1642,1648,1654,1660,1666,1672] -> review/shot13-sheet.jpg
+shot 14 (ИСТОРИЯ ОСТАЕТСЯ.): 29 frames [1678,1684,1690,1696,1702,1708,1714,1720,1726,1732,1738,1744,1750,1756,1762,1768,1774,1780,1786,1792,1798,1804,1810,1816,1822,1828,1834,1840,1846] -> review/shot14-sheet.jpg
+shot 15 (ЧТО ВЫ ПОЛУЧИТЕ НА ВЫХОДЕ.): 29 frames [1847,1853,1859,1865,1871,1877,1883,1889,1895,1901,1907,1913,1919,1925,1931,1937,1943,1949,1955,1961,1967,1973,1979,1985,1991,1997,2003,2009,2015] -> review/shot15-sheet.jpg
+shot 16 (РЕШЕНИЕ ЗА ЧЕЛОВЕКОМ.): 24 frames [2016,2022,2028,2034,2040,2046,2052,2058,2064,2070,2076,2082,2088,2094,2100,2106,2112,2118,2124,2130,2136,2142,2148,2154] -> review/shot16-sheet.jpg
+
+CUTS vs beat grid @ 115 BPM, 24fps (8ths = 0.2609s)
+ #   cut t     grid  grid#   nominal f  cut f   cut f t     err(f)  Δ@cut  peak(±2f)          shot change           result
+ 1    4.958s   8th    17      119.0    119   4.9583s  +0.0   148.1  f119 ok            shot 1 -> 2           PASS
+ 2    9.917s   8th    36      238.0    238   9.9167s  +0.0    12.7  f238 ok            shot 2 -> 3           PASS
+ 3   15.125s   8th    56      363.0    363   15.1250s  +0.0    15.0  f363 ok            shot 3 -> 4           PASS
+ 4   20.083s   8th    75      482.0    482   20.0833s  +0.0   205.1  f482 ok            shot 4 -> 5           PASS
+ 5   25.042s   8th    94      601.0    601   25.0417s  +0.0    66.6  f601 ok            shot 5 -> 6           PASS
+ 6   31.042s   8th   117      745.0    745   31.0417s  +0.0   149.1  f745 ok            shot 6 -> 7           PASS
+ 7   36.000s   8th   136      864.0    864   36.0000s  +0.0   202.2  f864 ok            shot 7 -> 8           PASS
+ 8   40.958s   8th   155      983.0    983   40.9583s  +0.0   149.5  f983 ok            shot 8 -> 9           PASS
+ 9   46.958s   8th   178     1127.0   1127   46.9583s  +0.0    22.5  f1127 ok           shot 9 -> 10          PASS
+10   51.917s   8th   197     1246.0   1246   51.9167s  +0.0   188.9  f1246 ok           shot 10 -> 11         PASS
+11   57.917s   8th   220     1390.0   1390   57.9167s  +0.0   144.9  f1390 ok           shot 11 -> 12         PASS
+12   63.917s   8th   243     1534.0   1534   63.9167s  +0.0   202.3  f1534 ok           shot 12 -> 13         PASS
+13   69.917s   8th   266     1678.0   1678   69.9167s  +0.0   142.3  f1678 ok           shot 13 -> 14         PASS
+14   76.958s   8th   293     1847.0   1847   76.9583s  +0.0     8.1  f1847 ok           shot 14 -> 15         PASS
+15   84.000s   8th   320     2016.0   2016   84.0000s  +0.0   179.0  f2016 ok           shot 15 -> 16         PASS
+all cuts on grid within 1 frame: PASS
+
+PACING: 15 hard cuts (0 in the last 5s), mean segment 5.63s, shortest 4.96s, plus 0 on-2s montage steps
+FLAT FRAMES (contrast < 6/255): none
+LOOP: diff(last=2159, first=0) = 68.40; typical consecutive diff in the first 40 frames = 1.93 (info: F4/F6 loop pixel-exactly and F4 checks it; other formats return to the opening image, changed)
+
+STORY ARC (loudness in dBFS over 100ms windows: median / 90th percentile; music = music stem median)
+ act          role       t0-t1         cuts  cuts/s  motion   mix med  mix p90  music
+ Путь сигнала process    0.00-90.00s     15    0.17     1.2    -18.0    -12.0   -18.0
+story arc: PASS (0/0 rules)
+
+TEXT (every string drawn, traced to screen; 387 frames sampled, morph windows skipped)
+text: PASS (0 cut-off/overlap, 0 in the safe zone)
+
+SOUND (mix: renders/audio.wav)
+  loudest 100ms window: 2.1s (-9.4 dBFS)
+  silence before it: 0.7s at <= -40 dBFS ending 0.8s in the 2s before (craft.md wants 0.5-4s when the story has a turn)
+  loudness: -13.8 LUFS integrated, range 1.6 LU, true peak -1.5 dBFS (phone target about -16 to -14 LUFS, peak <= -1)
+
+DEAD BEATS (the picture's change over 0.5s, every 0.25s; median 0.24, "still" below 0.80; silence acts are exempt)
+dead beats: PASS (0 stretches over 8s)
+PHONE SHEET: review\phone.jpg (one frame a second at 360px wide — read every caption at this size)
+
+video: 1920x1080, 2160 frames decoded

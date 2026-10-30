@@ -10,6 +10,8 @@ import { PlanPage, PlansPage } from './plan';
 import { ApiFailure, expectData, href, mutationHeaders, roleLabel, useResource } from './shared';
 import './features.css';
 import { ReplayControls } from './ReplayControls';
+import { hasStandLive, leaveStandLive } from './standContext';
+import './stand-flow.css';
 
 type S = components['schemas'];
 export const featureRegistrations: S['FeatureRegistration'][] = [
@@ -35,7 +37,7 @@ function route(pathname: string): { active: string; title: string; content: (run
   return { active: 'risks', title: 'Очередь рисков', content: run => <QueuePage run={run} /> };
 }
 
-function Login({ onSuccess }: { onSuccess: () => void }) {
+export function Login({ onSuccess }: { onSuccess: () => void }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [pending, setPending] = useState(false);
@@ -109,7 +111,7 @@ export function DiagnosticsApp() {
       const link = event.target instanceof Element ? event.target.closest('a') : null;
       if (!link || link.target || link.hasAttribute('download')) return;
       const next = new URL(link.href);
-      if (next.origin !== window.location.origin || next.pathname === '/gallery' || (next.hash && next.pathname === window.location.pathname)) return;
+      if (next.origin !== window.location.origin || next.pathname === '/gallery' || next.pathname === '/stand' || next.pathname.startsWith('/stand/') || (next.hash && next.pathname === window.location.pathname)) return;
       event.preventDefault();
       window.history.pushState(null, '', next);
       updateLocation(); window.scrollTo(0, 0);
@@ -143,6 +145,7 @@ export function DiagnosticsApp() {
   return <AppShell nav={nav} active={current.active} mode={session.data?.mode || null} dataTime={session.data?.dataTime || null} connection={connection}
     userLabel={identity.data?.displayName || 'Нет входа'} roleLabel={identity.data ? roleLabel[identity.data.role] : 'Просмотр'} onLogout={identity.data && online ? logout : undefined}
     breadcrumb={current.title} headerActions={run ? <a href="/?choose=1">Сменить набор</a> : undefined}>
+    {hasStandLive() && <div className="stand-presenter-bar"><strong>Демонстрация с ведущим</strong><a href="/stand" onClick={leaveStandLive}>Вернуться к автопоказу</a></div>}
     {!online && <Banner tone="high" title="Нет сети">Показан последний загруженный срез. Изменения недоступны до восстановления связи.</Banner>}
     {identity.loading && !identity.data && <Loading label="Проверяем вход..." />}
     {identity.error?.status === 401 && <Login onSuccess={() => window.location.reload()} />}

@@ -1,3 +1,4 @@
+import { countLabel } from './count';
 import { api } from '../api/client';
 import { Badge, Banner, Card, DataTable, Empty, ErrorState, Loading, PageHeading } from '../design-system/components';
 import { assetTypeLabel, locationLabel, date, expectData, fetchRiskQueue, href, percent, useResource } from './shared';
@@ -6,7 +7,7 @@ export function AssetsPage({ run }: { run: string }) {
   const assets = useResource(`assets-${run}`, async () => expectData(await api.GET('/api/v1/assets', { params: { query: { scenarioRunId: run, limit: 100, offset: 0 } } })));
   return <div className="feature-stack"><PageHeading eyebrow="Реестр" title="Обзор активов" subtitle="Оборудование и места измерения в выбранном запуске." />
     {assets.loading && !assets.data && <Loading />}{assets.error && !assets.data && <ErrorState message={assets.error.message} retry={assets.refresh} />}{assets.stale && <Banner tone="high" title="Сохраненный реестр">Проверьте обновления после восстановления связи.</Banner>}
-    {assets.data && <Card title={`${assets.data.data.total} активов`} subtitle={`Время данных: ${date(assets.data.dataTime)}`}><DataTable label="Реестр активов"><thead><tr><th>Актив</th><th>Тип</th><th>Площадка</th><th>Место измерения</th></tr></thead><tbody>{assets.data.data.items.map(asset => <tr key={asset.assetId}><td><a href={href(`/assets/${encodeURIComponent(asset.assetId)}`, run)}><strong>{asset.name}</strong></a></td><td>{assetTypeLabel[asset.assetType]}</td><td>{asset.siteId}</td><td>{locationLabel(asset.measurementLocation)}</td></tr>)}</tbody></DataTable>{assets.data.data.items.length === 0 && <Empty title="Активов нет">Проверьте выбранный набор данных.</Empty>}</Card>}
+    {assets.data && <Card title={countLabel(assets.data.data.total, ['актив', 'актива', 'активов'])} subtitle={`Время данных: ${date(assets.data.dataTime)}`}><DataTable label="Реестр активов"><thead><tr><th>Актив</th><th>Тип</th><th>Площадка</th><th>Место измерения</th></tr></thead><tbody>{assets.data.data.items.map(asset => <tr key={asset.assetId}><td><a href={href(`/assets/${encodeURIComponent(asset.assetId)}`, run)}><strong>{asset.name}</strong></a></td><td>{assetTypeLabel[asset.assetType]}</td><td>{asset.siteId}</td><td>{locationLabel(asset.measurementLocation)}</td></tr>)}</tbody></DataTable>{assets.data.data.items.length === 0 && <Empty title="Активов нет">Проверьте выбранный набор данных.</Empty>}</Card>}
   </div>;
 }
 

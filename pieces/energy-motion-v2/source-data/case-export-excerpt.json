@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "0.1.0",
+  "mode": "simulation",
+  "dataTime": "2026-07-24T07:40:00Z",
+  "calculationOrigin": "computed",
+  "modelVersion": "deterministic-thermal-0.1.0",
+  "policyVersion": "demo-policy-0.1.0",
+  "limitation": "Советчик без команд в сеть. Индекс не вероятность отказа.",
+  "snapshot": {
+    "asset": {
+      "assetId": "tp177-t1",
+      "name": "ТП-177 / Т-1",
+      "measurementLocation": "synthetic phase A contact; not a real installed sensor"
+    },
+    "analysis": {
+      "risk": {
+        "score": 5.4,
+        "scaleMax": 10,
+        "priority": "medium",
+        "label": "Пилотный индекс приоритета 5.4/10; не вероятность отказа.",
+        "probabilistic": false
+      },
+      "advisoryOnly": true,
+      "controlCommandsAllowed": false
+    },
+    "details": {
+      "forecastEnabled": false
+    }
+  },
+  "series": [
+    {
+      "eventTime": "2026-07-21T07:40:00Z",
+      "observedC": 58.2809,
+      "expectedC": 48.67568815329304,
+      "residualC": 9.605211846706965,
+      "loadFraction": 0.648538,
+      "ambientC": 22.8257,
+      "quality": "good",
+      "sourceIds": [
+        "tp177-t1:primary_a",
+        "tp177-t1:load",
+        "tp177-t1:ambient",
+        "tp177-t1:independent_a"
+      ],
+      "historicalLowerC": null,
+      "historicalUpperC": null
+    }
+  ]
+}

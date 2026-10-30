@@ -1,0 +1,7 @@
+.stand-presenter-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border: 1px solid var(--brand-primary); background: #edf5fb; color: #173a5e; border-radius: 10px; margin-bottom: 16px; }
+.stand-presenter-bar a { color: #124f82; font-weight: 700; }
+.stand-continue { max-width: 720px; margin: 5vh auto; padding: 24px; }
+.stand-continue-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.stand-continue-header a { color: #124f82; }
+.stand-continue p { line-height: 1.55; }
+.stand-continue-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }

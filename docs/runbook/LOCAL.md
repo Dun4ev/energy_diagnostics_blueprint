@@ -4,7 +4,7 @@ Runbook относится к интегрированному локально�
 
 ## Первичная настройка
 
-Все команды Compose выполняйте из основного checkout проекта, где находится его `infra/.env`. Для этой машины основной checkout: `/Users/j15/Documents/Code_and_Scripts_local/prototypes/energy_diagnostics_blueprint`. Не запускайте Compose с таким же именем проекта из worktree: bind mounts укажут на другой checkout.
+Все команды Compose выполняйте из основного checkout проекта, где находится его `infra/.env`. Не запускайте Compose с таким же именем проекта из worktree: bind mounts укажут на другой checkout.
 
 Один раз сгенерируйте отсутствующие локальные пароли:
 

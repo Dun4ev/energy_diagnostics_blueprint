@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ЭнергоДиагностика: путь сигнала</title>
+<style>html,body{margin:0;height:100%;background:#082943}body{display:flex;align-items:center;justify-content:center}canvas{width:min(100vw,177.78vh);height:auto;display:block}</style>
+</head><body><canvas id="c" width="1920" height="1080"></canvas><script>
+"use strict";
+const FPS=24,W=1920,H=1080,BPM=115,BEAT=60/BPM,E8=BEAT/2,E16=BEAT/4,GRID0=.511;
+const DURATION=90,NFRAMES=DURATION*FPS,LOOP_T=DURATION,SAFE={top:30,bottom:30,right:30},CX=W/2;
+const HAND='"Segoe UI", Arial, sans-serif';
+// A static key frame for each product beat. The images are from the user's synthetic demo.
+const STEPS=[
+ {at:0, title:['ОТ СИГНАЛА','К РЕШЕНИЮ','ИНЖЕНЕРА.'],desc:'Данные, проверка и действия в одном учебном сценарии.',tag:'ПРОДУКТОВЫЙ ОБЗОР',img:'03-deviation.png',crop:[775,120,790,625],dark:true,badge:'+11,8 °C',badge2:'Отклонение от ожидаемого режима'},
+ {at:5, title:['НАЧНИТЕ','С ПОКАЗА.'],desc:'Переход создает отдельный учебный запуск без переноса решений записи.',tag:'01 / СТЕНД',img:'03-deviation.png',crop:[450,105,1100,755],focus:[1320,810,230,45],afterImg:'10-case-top.png',afterCrop:[0,55,1600,845],afterFocus:[10,140,205,44],afterDelay:1.62,afterAction:'ОБЗОР АКТИВОВ',afterSource:'ПРИМЕР ИНТЕРФЕЙСА УЧЕБНОГО ЗАПУСКА',dark:false,action:'ПРОДОЛЖИТЬ С ВЕДУЩИМ'},
+ {at:10, title:['ВСЕ АКТИВЫ','НА ОДНОМ','ЭКРАНЕ.'],desc:'Откройте реестр и выберите оборудование для разбора.',tag:'02 / АКТИВЫ',img:'assets-overview.png',crop:[245,340,1320,550],focus:[282,602,116,25],afterImg:'asset-detail.png',afterCrop:[0,105,1600,795],afterFocus:[10,240,205,45],afterDelay:1.62,afterAction:'ОЧЕРЕДЬ РИСКОВ',dark:false,action:'ОТКРЫТЬ ТП-177 / Т-1'},
+ {at:15, title:['ЧТО ТРЕБУЕТ','ВНИМАНИЯ?'],desc:'Очередь показывает сигнал, приоритет и качество данных.',tag:'03 / ОЧЕРЕДЬ РИСКОВ',img:'09-queue.png',crop:[245,458,1325,432],focus:[280,707,125,26],dark:false,action:'ВЫБРАТЬ ТП-177 / Т-1'},
+ {at:20, title:['РАЗБОР','ПО ОБЪЕКТУ.'],desc:'Перейдите в диагностический случай и изучите наблюдения.',tag:'04 / СЛУЧАЙ',img:'10-case-top.png',crop:[0,105,1600,795],focus:[10,190,205,45],afterImg:'cases-list.png',afterCrop:[215,220,1380,600],afterDelay:1.62,afterAction:'СПИСОК СЛУЧАЕВ',dark:true,action:'РАЗДЕЛ ДИАГНОСТИКА'},
+ {at:25, title:['ИЗМЕРЕНО','И ОЖИДАЛОСЬ.'],desc:'График сопоставляет температуру с ожидаемым режимом.',tag:'05 / ГРАФИК',img:'03-deviation.png',crop:[770,110,790,625],dark:true,badge:'+11,8 °C',badge2:'Пример учебного отклонения'},
+ {at:31, title:['КАЧЕСТВО','ДАННЫХ','ИМЕЕТ ЗНАЧЕНИЕ.'],desc:'Недостаточно данных означает неизвестность, а не норму.',tag:'06 / ДАННЫЕ',img:'models-and-data.png',crop:[215,125,1380,760],dark:false,action:'ПРОВЕРИТЬ ИСТОЧНИК'},
+ {at:36, title:['ГИПОТЕЗА','НЕ РАВНА','ДЕФЕКТУ.'],desc:'Инженер видит признаки, ограничения и следующие проверки.',tag:'07 / АНАЛИЗ',img:'04-hypothesis.png',crop:[795,115,755,560],dark:true,badge:'5,4 / 10',badge2:'Индекс приоритета, не вероятность отказа'},
+ {at:41, title:['ПРОВЕРЬТЕ','ДОКАЗАТЕЛЬСТВА.'],desc:'Откройте материалы, время наблюдения и происхождение данных.',tag:'08 / ОБОСНОВАНИЕ',img:'evidence-drawer.png',crop:[350,100,1200,760],beforeImg:'case-export-buttons.png',beforeCrop:[900,250,680,500],beforeFocus:[1440,462,115,27],source:'ПРИМЕР ДРУГОГО УЧЕБНОГО ЗАПУСКА',dark:false,action:'ОТКРЫТЬ ЗАПИСИ'},
+ {at:47, title:['СОЗДАЙТЕ','ПРОЕКТ','ПРОВЕРКИ.'],desc:'Инженер формирует проект плана и указывает основание.',tag:'09 / ДЕЙСТВИЕ ИНЖЕНЕРА',img:'14-plan-dialog.jpg',crop:[400,150,800,650],beforeImg:'13-case-actions.png',beforeCrop:[1000,0,575,425],beforeFocus:[1250,322,175,38],source:'ВОЗВРАТ К ИСХОДНОМУ УЧЕБНОМУ СЛУЧАЮ',dark:false,action:'СОЗДАТЬ ПРОЕКТ ПРОВЕРКИ'},
+ {at:52, title:['ПЛАН','С КОНКРЕТНЫМИ','ШАГАМИ.'],desc:'Инженер редактирует шаги и передает проект на согласование.',tag:'10 / ПЛАН',img:'06-plan.png',crop:[795,115,755,560],beforeImg:'engineer-plan-editor.png',beforeCrop:[230,780,1640,1150],beforeFocus:[248,1880,190,42],beforeEnd:2.6,beforeAction:'ПЕРЕДАТЬ НА СОГЛАСОВАНИЕ',beforeSource:'ПРИМЕР РЕДАКТИРОВАНИЯ · ТП-309 / Т-1',source:'ДРУГОЙ ПЛАН ТП-177 · ЗАПИСЬ СТЕНДА',dark:true,action:'ПОДГОТОВЛЕННАЯ ИСТОРИЯ'},
+ {at:58, title:['СОГЛАСОВАНИЕ','ПО РОЛЯМ.'],desc:'Согласующий рассматривает проект. Решение принимает человек.',tag:'11 / СОГЛАСОВАНИЕ',img:'07-approval.png',crop:[795,115,755,560],dark:false,action:'ПОДГОТОВЛЕННАЯ ИСТОРИЯ'},
+ {at:64, title:['РЕЗУЛЬТАТ','ПРОВЕРКИ','ЗАФИКСИРОВАН.'],desc:'Исполнитель записывает результат в отдельном учебном запуске.',tag:'12 / ИСПОЛНЕНИЕ',img:'plan-result.png',crop:[215,120,1380,760],beforeImg:'plans-list.png',beforeCrop:[245,240,1320,360],beforeFocus:[282,496,260,26],beforeAction:'ОТКРЫТЬ ПЛАН',beforeSource:'ПРИМЕР ДРУГОГО УЧЕБНОГО ЗАПУСКА',middleImg:'technician-result-dialog.png',middleCrop:[438,190,565,650],middleFocus:[825,780,155,38],middleStart:1.62,middleEnd:4,middleAction:'СОХРАНИТЬ РЕЗУЛЬТАТ',middleSource:'ФОРМА ИСПОЛНИТЕЛЯ · ОТДЕЛЬНАЯ РЕПЕТИЦИЯ',source:'ГОТОВЫЙ РЕЗУЛЬТАТ · ДРУГОЙ ЗАПУСК',dark:true,action:'ЗАДАНИЕ ВЫПОЛНЕНО'},
+ {at:70, title:['ИСТОРИЯ','ОСТАЕТСЯ.'],desc:'Сохранены решения, участники и ревизии учебного разбора.',tag:'13 / ИСТОРИЯ',img:'case-history.png',crop:[215,110,1380,760],source:'ПРИМЕР ДРУГОГО УЧЕБНОГО ЗАПУСКА',dark:false,action:'ПРОКРУТИТЬ К ИСТОРИИ'},
+ {at:77, title:['ЧТО ВЫ','ПОЛУЧИТЕ','НА ВЫХОДЕ.'],desc:'Печатный вид случая, JSON с данными и историю решений.',tag:'14 / РЕЗУЛЬТАТ',img:'case-print-conclusion.png',crop:[0,0,1224,1584],beforeImg:'case-export-buttons.png',beforeCrop:[900,180,680,500],beforeFocus:[1393,260,68,40],beforeFocus2:[1468,260,108,40],beforeEnd:2.8,source:'ПРИМЕР ДРУГОГО УЧЕБНОГО ЗАПУСКА',dark:false,action:'ФРАГМЕНТ ПЕЧАТНОГО ВИДА',kind:'output'},
+ {at:84, title:['РЕШЕНИЕ','ЗА ЧЕЛОВЕКОМ.'],desc:'Советчик помогает разобраться в сигнале. Команд оборудованию нет.',tag:'15 / ИТОГ',img:'models-and-data.png',crop:[215,125,1380,760],dark:true,action:'ДАННЫЕ  →  АНАЛИЗ  →  РЕШЕНИЕ'}
+];
+// Snap each change to the nearest musical eighth and to a renderable frame.
+for(let i=1;i<STEPS.length;i++)STEPS[i].at=Math.round((GRID0+Math.round((STEPS[i].at-GRID0)/E8)*E8)*FPS)/FPS;
+const ERA_LIST=STEPS.map((s,i)=>[s.at,i+1<STEPS.length?STEPS[i+1].at:DURATION,()=>sceneStill(i)]);
+const TIMELINE={width:W,height:H,fps:FPS,bpm:BPM,duration:DURATION,frames:NFRAMES,loop:LOOP_T,safe:SAFE,format:'product-walkthrough',gridOffset:GRID0,
+ shots:STEPS.map((s,i)=>({id:i+1,key:`step-${i+1}`,era:i,t0:s.at,t1:i+1<STEPS.length?STEPS[i+1].at:DURATION,title:s.title.join(' ')})),
+ cuts:STEPS.slice(1).map(s=>s.at),morphs:[],cues:{},acts:[{name:'Путь сигнала',role:'process',t0:0,t1:90}],
+ board:STEPS.map((s,i)=>({t:s.at+1.7,title:s.tag,sound:'',next:i+1<STEPS.length?STEPS[i+1].tag:'итог'})),narration:[]};
+window.TIMELINE=TIMELINE;

@@ -15,3 +15,29 @@ test-results/
 .DS_Store
 
 .playwright-mcp/
+
+# Локальные worktree и временные файлы производства видео.
+/.handoff-worktrees/
+/.video-v*-worktrees/
+/debug.log
+/pieces/*/.tooling/
+/pieces/*/frames/
+/pieces/*/review/
+/pieces/*/renders/*.wav
+/pieces/energy-explainer/renders/final.mp4
+/pieces/energy-motion-v2/renders/final.mp4
+/pieces/*/storyboard-p*.png
+/pieces/*/storyboard-detail*.png
+/pieces/*/check-*.png
+/pieces/*/checked-scenes.png
+/pieces/*/encoded-*.png
+/pieces/*/final-details.png
+/pieces/*/key-frames.png
+/pieces/*/motion-check.png
+/pieces/*/motion-grid.jpg
+/pieces/*/motion-sample.png
+/pieces/*/share-preview.jpg
+/pieces/*/style-gallery.png
+/pieces/*/timing-check.png
+/pieces/*/corrected-frame.jpg
+/pieces/*/visual-review.jpg
