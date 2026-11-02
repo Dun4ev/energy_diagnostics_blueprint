@@ -657,6 +657,7 @@ class Page(DTO, Generic[T]):
 class LoginRequest(DTO):
     username: ID
     password: Annotated[str, Field(min_length=1, max_length=256)]
+    quickLogin: StrictBool = False
 
 
 class Mutation(DTO):
@@ -736,6 +737,7 @@ class SessionAdvance(DTO):
 
 
 class Health(DTO):
+    demoQuickLoginEnabled: StrictBool = False
     status: Literal["ok", "degraded"]
     stage: Literal["foundation", "integrated"]
     database: Literal["ready", "unavailable", "unconfigured"]

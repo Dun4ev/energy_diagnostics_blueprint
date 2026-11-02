@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 const shapes: Record<string, string> = {
+  overview: 'M4 20h16M6 17v-5h3v5M11 17V8h3v9M16 17V4h3v13',
   grid: 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',
   signal: 'M3 12h4l3-8 4 16 3-8h4',
   risk: 'M12 3 2 21h20L12 3ZM12 9v5M12 17v1',

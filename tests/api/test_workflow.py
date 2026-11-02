@@ -21,6 +21,7 @@ ORIGIN = "http://localhost:8080"
 
 @pytest.fixture
 def setup(tmp_path, monkeypatch):
+    monkeypatch.setenv("DEMO_QUICK_LOGIN", "false")
     engine = create_engine(f"sqlite:///{tmp_path / 'api.db'}")
     maker = sessionmaker(engine, expire_on_commit=False)
     monkeypatch.setattr(main, "factory", lambda: maker)
@@ -242,3 +243,43 @@ def test_store_analysis_isolated_run_and_immutable_history(setup):
     with maker() as session:
         assert session.scalar(select(func.count()).select_from(db.AnalysisRow)) == 2
         assert session.scalar(select(func.count()).select_from(db.MeasurementRow)) == 1
+
+
+def test_quick_login_flag_permissions_and_revoked_session(setup, monkeypatch):
+    client, maker = setup
+    body = {"username": "viewer", "password": "demo", "quickLogin": True}
+    assert client.get("/api/v1/health").json()["demoQuickLoginEnabled"] is False
+    assert client.post("/api/v1/auth/login", headers={"Origin": ORIGIN}, json=body).status_code == 403
+    monkeypatch.setenv("DEMO_QUICK_LOGIN", "true")
+    assert client.get("/api/v1/health").json()["demoQuickLoginEnabled"] is True
+    # Origin protection also applies to passwordless entry.
+    assert client.post("/api/v1/auth/login", json=body).status_code == 403
+    csrf = login(client, "engineer")
+    old_token = client.cookies.get("energy_session")
+    response = client.post("/api/v1/auth/login", headers={"Origin": ORIGIN}, json=body)
+    assert response.status_code == 200
+    assert response.json()["role"] == "viewer"
+    assert response.json()["permissions"] == ["read"]
+    assert response.json()["csrfToken"] != csrf
+    assert post(client, f"/api/v1/cases/{CASE}/decisions?scenarioRunId={RUN}", {
+        "expectedRevision": 1, "reason": "Review", "evidenceIds": [],
+        "targetState": "awaiting_evidence", "evidenceRevision": 1, "outcome": None,
+    }, response.json()["csrfToken"]).status_code == 403
+    from apps.api import auth
+    with maker() as session:
+        assert session.get(db.AuthSessionRow, auth._hash(old_token)).revoked
+    for role in m.Role:
+        response = client.post("/api/v1/auth/login", headers={"Origin": ORIGIN},
+                               json={**body, "username": role.value})
+        assert response.status_code == 200
+        assert response.json()["role"] == role.value
+    with maker.begin() as session:
+        session.get(db.UserRow, "viewer").enabled = False
+    assert client.post("/api/v1/auth/login", headers={"Origin": ORIGIN}, json=body).status_code == 401
+    assert client.post("/api/v1/auth/login", headers={"Origin": ORIGIN},
+                       json={**body, "username": "unknown"}).status_code == 401
+    monkeypatch.setenv("DEMO_QUICK_LOGIN", "false")
+    assert client.post("/api/v1/auth/login", headers={"Origin": ORIGIN}, json=body).status_code == 403
+    assert client.post("/api/v1/auth/login", headers={"Origin": ORIGIN},
+                       json={"username": "engineer", "password": "demo"}).status_code == 401
+    login(client, "engineer")

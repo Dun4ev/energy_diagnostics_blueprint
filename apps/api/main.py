@@ -96,6 +96,7 @@ def health():
         stage="integrated",
         database=database,
         businessRuntime=runtime,
+        demoQuickLoginEnabled=auth.quick_login_enabled(),
         advisoryOnly=True,
         controlCommandsAllowed=False,
         externalAiEnabled=False,
@@ -176,8 +177,16 @@ def login(body: m.LoginRequest, request: Request, response: Response):
     p.require(request.url.scheme == "https" or request.url.hostname in {"localhost", "127.0.0.1"},
               "HTTPS_REQUIRED", "Для входа требуется HTTPS", 403)
     with factory().begin() as session:
-        user = auth.verify_login(session, body.username, body.password)
+        if body.quickLogin:
+            p.require(auth.quick_login_enabled(), "QUICK_LOGIN_DISABLED",
+                      "Быстрый вход отключен", 403)
+            user = session.get(db.UserRow, body.username) if body.username in {r.value for r in m.Role} else None
+            if user is not None and not user.enabled:
+                user = None
+        else:
+            user = auth.verify_login(session, body.username, body.password)
         p.require(user is not None, "UNAUTHENTICATED", "Неверные учетные данные", 401)
+        auth.revoke_session(session, request.cookies.get(auth.COOKIE))
         token, csrf = auth.create_session(session, user)
         identity = auth.identity(user, csrf)
     response.set_cookie(auth.COOKIE, token, httponly=True,

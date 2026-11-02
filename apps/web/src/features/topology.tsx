@@ -38,7 +38,8 @@ export function TopologyCard({ snapshot }: { snapshot: Snapshot }) {
   const { width, height, positions } = layout(topology);
   const names = new Map(topology.nodes.map(node => [node.nodeId, node.label]));
   return <Card title="Упрощенная схема" subtitle={topology.label}>
-    <div className="feature-topology-scroll"><svg className="feature-topology-diagram" viewBox={`0 0 ${width} ${height}`} width={width} height={height} role="img" aria-label="Схема связей оборудования с состояниями по данным модели, телеметрии или проверки">
+    <p className="feature-horizontal-hint">Прокрутите схему вправо, чтобы увидеть остальные узлы.</p>
+    <div className="feature-topology-scroll" tabIndex={0} role="region" aria-label="Схема оборудования с горизонтальной прокруткой"><svg className="feature-topology-diagram" viewBox={`0 0 ${width} ${height}`} width={width} height={height} role="img" aria-label="Схема связей оборудования с состояниями по данным модели, телеметрии или проверки">
       <title>Схема связей оборудования</title>
       {topology.edges.map((edge, index) => {
         const start = positions.get(edge.source);

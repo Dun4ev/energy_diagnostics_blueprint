@@ -16,6 +16,10 @@ test-results/
 
 .playwright-mcp/
 
+# Local design build artifacts and interview state.
+/.impeccable/build/
+/.impeccable/questions/
+
 # Локальные worktree и временные файлы производства видео.
 /.handoff-worktrees/
 /.video-v*-worktrees/

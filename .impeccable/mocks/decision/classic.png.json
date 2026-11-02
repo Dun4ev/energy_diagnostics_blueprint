@@ -1,0 +1,6 @@
+{
+  "prompt": "Design a sophisticated but familiar Russian-language engineering desktop application as a full-width landscape screenshot with no browser frame. Direction Классический дашборд: clean light surfaces, dark blue left sidebar, compact standard panels, clear dense hierarchy, restrained blue accents and semantic state colors. Working diagnostic case ТП-177 / Т-1, marked REFERENCE and data time, left navigation includes separate Обзор руководителя. Main center has three synchronized stacked time-series tracks: measured orange and expected blue dashed temperature, residual °C, load %, quality and event indicators with a shared cursor. Right side has a real evidence explorer showing source provenance, unverified thermography and timestamps, below it engineering hypothesis and next check. Include pilot priority 7,2 / 10 without describing it as probability. Accurate legible Russian labels, polished accessible business application, no extraneous controls or command equipment; 80°C and 68°C are illustrative only. Use the reference image for product content but redesign the visual execution.",
+  "source": "image_gen",
+  "reference": ".impeccable/review/desktop.png",
+  "status": "illustrative concept, not factual data"
+}

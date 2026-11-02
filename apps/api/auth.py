@@ -48,6 +48,10 @@ def seed_users(session: Session):
             user.enabled = True
 
 
+def quick_login_enabled() -> bool:
+    return os.getenv("DEMO_QUICK_LOGIN", "false").lower() == "true"
+
+
 def verify_login(session: Session, username: str, password: str) -> db.UserRow | None:
     user = session.get(db.UserRow, username)
     if user and user.enabled and hmac.compare_digest(user.password_hash, _password(password, user.salt)):
@@ -64,6 +68,12 @@ def identity(user: db.UserRow, csrf_token: str) -> m.Identity:
     return m.Identity(actorId=user.id, displayName=f"DEMO {user.id}",
                       role=m.Role(user.role), permissions=permissions(user),
                       csrfToken=csrf_token)
+
+
+def revoke_session(session: Session, token: str | None):
+    row = session.get(db.AuthSessionRow, _hash(token or ""))
+    if row is not None:
+        row.revoked = True
 
 
 def create_session(session: Session, user: db.UserRow) -> tuple[str, str]:

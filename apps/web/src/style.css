@@ -7,3 +7,21 @@
 @media(max-width:600px) { h1 { font-size: 23px; }.breadcrumb { display: none; }.topbar-right { margin-left: auto; }.profile strong { font-size: 12px; }.profile .button { font-size: 12px; }.data-context-left>span:not(.badge) { font-size: 12px; }.data-context-right { font-size: 12px; }.workspace { padding: 20px 12px; gap: 16px; }.page-heading { gap: 14px; }.page-actions { width: 100%; }.button { min-height: 44px; }.panel-heading,.panel-body { padding: 16px; }.app-footer { padding: 12px; flex-direction: column; font-size: 12px; gap: 4px; }.badge { white-space: normal; }.dialog-actions { flex-wrap: wrap; }.data-table { min-width: 540px; }.loading-state { padding: 32px 12px; } }
 @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation: none !important; transition: none !important; } }
 @media print { .sidebar,.topbar,.data-context,.page-actions,.app-footer,.button { display: none !important; }.app-main { margin: 0; width: 100%; }.workspace { padding: 0; }.panel { break-inside: avoid; }.two-column { display: block; }.two-column .panel { margin-bottom: 12px; } }
+
+/* Инженерный атлас: единая навигация, контекст и рабочие поверхности. */
+.app-layout { background: var(--canvas); }
+.sidebar { box-shadow: 1px 0 0 #082c45; }
+.brand { min-height: 76px; padding-top: 16px; padding-bottom: 16px; }
+.workspace-label { padding-top: 14px; }
+.sidebar nav { gap: 3px; }
+.nav-link { min-height: 42px; }
+.topbar { min-height: 52px; }
+.data-context { background: #f7fafc; min-height: 38px; }
+.workspace { max-width: 1800px; padding-top: 21px; }
+.panel { border-color: #d7e3ea; border-radius: 8px; }
+.panel-heading { padding-top: 16px; padding-bottom: 13px; }
+.panel-body { padding-top: 16px; padding-bottom: 16px; }
+.page-heading h1 { color: #17334d; font-size: 26px; letter-spacing: -.025em; }
+.data-table th { background: #f5f9fb; font-size: 11px; }
+.data-table td { padding-top: 13px; padding-bottom: 13px; }
+::selection { background: #c8e5f2; color: #17334d; }

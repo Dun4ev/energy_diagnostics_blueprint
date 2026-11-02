@@ -1671,6 +1671,11 @@ export interface components {
              */
             database: "ready" | "unavailable" | "unconfigured";
             /**
+             * Demoquickloginenabled
+             * @default false
+             */
+            demoQuickLoginEnabled: boolean;
+            /**
              * Externalaienabled
              * @constant
              */
@@ -1736,6 +1741,11 @@ export interface components {
         LoginRequest: {
             /** Password */
             password: string;
+            /**
+             * Quicklogin
+             * @default false
+             */
+            quickLogin: boolean;
             /** Username */
             username: string;
         };

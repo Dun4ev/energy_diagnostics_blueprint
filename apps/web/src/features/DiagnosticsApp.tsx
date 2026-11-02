@@ -4,8 +4,10 @@ import type { components } from '../api/generated';
 import { AppShell, type NavItem } from '../shell/AppShell';
 import { Banner, Button, Card, Empty, ErrorState, Loading, PageHeading } from '../design-system/components';
 import { AssetsPage, AssetPage, ModelsPage } from './support';
+import { DirectorPage } from './director';
 import { QueuePage, CasesPage } from './queue';
 import { CasePage } from './case';
+import { parseDemoStep } from './CaseDemoRoute';
 import { PlanPage, PlansPage } from './plan';
 import { ApiFailure, expectData, href, mutationHeaders, roleLabel, useResource } from './shared';
 import './features.css';
@@ -15,21 +17,23 @@ import './stand-flow.css';
 
 type S = components['schemas'];
 export const featureRegistrations: S['FeatureRegistration'][] = [
+  { id: 'director', route: '/overview', label: 'Обзор руководителя', permission: 'read', implemented: true },
   { id: 'assets', route: '/assets', label: 'Обзор активов', permission: 'read', implemented: true },
   { id: 'diagnostics', route: '/diagnostics', label: 'Диагностика', permission: 'read', implemented: true },
   { id: 'risks', route: '/risks', label: 'Очередь рисков', permission: 'read', implemented: true },
   { id: 'plans', route: '/work-plans', label: 'Задания ТОиР', permission: 'read', implemented: true },
   { id: 'models', route: '/models-and-data', label: 'Модели и данные', permission: 'read', implemented: true },
 ];
-const icons: Record<string, string> = { assets: 'grid', diagnostics: 'diagnostics', risks: 'risk', plans: 'plan', models: 'data' };
+const icons: Record<string, string> = { director: 'overview', assets: 'grid', diagnostics: 'diagnostics', risks: 'risk', plans: 'plan', models: 'data' };
 
-function route(pathname: string): { active: string; title: string; content: (run: string, identity: S['Identity'] | null) => React.ReactNode } {
+function route(pathname: string, search: string): { active: string; title: string; content: (run: string, identity: S['Identity'] | null) => React.ReactNode } {
   const caseId = pathname.match(/^\/diagnostics\/cases\/([^/]+)$/)?.[1];
   const planId = pathname.match(/^\/work-plans\/([^/]+)$/)?.[1];
   const assetId = pathname.match(/^\/assets\/([^/]+)$/)?.[1];
-  if (caseId) return { active: 'diagnostics', title: 'Диагностический случай', content: (run, user) => <CasePage id={decodeURIComponent(caseId)} run={run} identity={user} /> };
+  if (caseId) return { active: 'diagnostics', title: 'Диагностический случай', content: (run, user) => <CasePage id={decodeURIComponent(caseId)} run={run} identity={user} demoStep={parseDemoStep(search)} /> };
   if (planId) return { active: 'plans', title: 'Проверочный план', content: (run, user) => <PlanPage id={decodeURIComponent(planId)} run={run} identity={user} /> };
   if (assetId) return { active: 'assets', title: 'Актив', content: run => <AssetPage id={decodeURIComponent(assetId)} run={run} /> };
+  if (pathname === '/overview') return { active: 'director', title: 'Обзор руководителя', content: run => <DirectorPage run={run} /> };
   if (pathname === '/diagnostics') return { active: 'diagnostics', title: 'Диагностика', content: run => <CasesPage run={run} /> };
   if (pathname === '/work-plans') return { active: 'plans', title: 'Задания ТОиР', content: run => <PlansPage run={run} /> };
   if (pathname === '/assets') return { active: 'assets', title: 'Обзор активов', content: run => <AssetsPage run={run} /> };
@@ -37,18 +41,42 @@ function route(pathname: string): { active: string; title: string; content: (run
   return { active: 'risks', title: 'Очередь рисков', content: run => <QueuePage run={run} /> };
 }
 
-export function Login({ onSuccess }: { onSuccess: () => void }) {
+function QuickLogin({ currentRole, disabled = false }: { currentRole?: S['Role']; disabled?: boolean }) {
+  const [expanded, setExpanded] = useState(!currentRole);
+  const [pending, setPending] = useState(false);
+  const [failure, setFailure] = useState<ApiFailure | null>(null);
+  async function switchUser(role: S['Role']) {
+    setPending(true); setFailure(null);
+    try {
+      expectData(await api.POST('/api/v1/auth/login', { body: { username: role, password: 'demo', quickLogin: true } }));
+      window.location.reload();
+    } catch (error) {
+      setFailure(error instanceof ApiFailure ? error : new ApiFailure(0, 'Нет связи с сервером.'));
+      setPending(false);
+    }
+  }
+  return <div className="quick-login">
+    {currentRole && <Button variant="ghost" aria-label="Сменить пользователя" aria-expanded={expanded} disabled={disabled || pending} onClick={() => setExpanded(!expanded)}><span className="quick-login-label">Сменить пользователя</span><span className="quick-login-label-compact">Сменить</span></Button>}
+    {expanded && <div className="quick-login-options" role="group" aria-label="Тестовые пользователи">
+      <small>Тестовый вход без пароля</small>
+      {(Object.keys(roleLabel) as S['Role'][]).map(role => <Button key={role} disabled={disabled || pending || role === currentRole} onClick={() => switchUser(role)}>{roleLabel[role]}</Button>)}
+      {failure && <ErrorState message={failure.message} requestId={failure.requestId} />}
+    </div>}
+  </div>;
+}
+
+export function Login({ onSuccess, quickLogin = false }: { onSuccess: () => void; quickLogin?: boolean }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [pending, setPending] = useState(false);
   const [failure, setFailure] = useState<ApiFailure | null>(null);
   async function submit(event: React.FormEvent) {
     event.preventDefault(); setPending(true); setFailure(null);
-    try { expectData(await api.POST('/api/v1/auth/login', { body: { username, password } })); setPassword(''); onSuccess(); }
+    try { expectData(await api.POST('/api/v1/auth/login', { body: { username, password, quickLogin: false } })); setPassword(''); onSuccess(); }
     catch (error) { setFailure(error instanceof ApiFailure ? error : new ApiFailure(0, 'Нет связи с сервером.')); }
     finally { setPending(false); }
   }
-  return <Card className="feature-login" title="Вход в демонстрационный контур" subtitle="Для действий нужна серверная роль и сессия."><form className="feature-form" onSubmit={submit}>
+  return <Card className="feature-login" title="Вход в демонстрационный контур" subtitle="Для действий нужна серверная роль и сессия.">{quickLogin && <QuickLogin />}<form className="feature-form" onSubmit={submit}>
     <label className="field">Пользователь<input autoComplete="username" value={username} onChange={event => setUsername(event.target.value)} required /></label>
     <label className="field">Пароль<input type="password" autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} required /></label>
     {failure && <ErrorState message={failure.message} requestId={failure.requestId} />}
@@ -82,6 +110,10 @@ function ScenarioPicker({ identity }: { identity: S['Identity'] }) {
     finally { setPending(null); }
   }
   return <div className="feature-stack"><PageHeading eyebrow="DEMO" title="Выберите набор данных" subtitle="REFERENCE воспроизводит значения слайда; SIMULATION рассчитывается из синтетических наблюдений." />
+    <Card className="case-demo-entry" title="Один случай, четыре вопроса" subtitle="За 2–3 минуты разберите ТП-177 / Т-1: вывод, основания, недостающие данные и следующий шаг.">
+      <p>REFERENCE · значения презентации. Разбор доступен для просмотра и не изменяет данные случая.</p>
+      <a className="button button-primary" href="/diagnostics/cases/AG-2026-017?run=reference-slide29&demoStep=1">Разобрать один случай</a>
+    </Card>
     {scenarios.loading && !scenarios.data && <Loading />}
     {scenarios.error && !scenarios.data && <ErrorState message={scenarios.error.message} retry={scenarios.refresh} />}
     {failure && <ErrorState message={failure.message} requestId={failure.requestId} />}
@@ -99,6 +131,7 @@ export function DiagnosticsApp() {
   const [online, setOnline] = useState(navigator.onLine);
   const url = new URL(location);
   const run = url.searchParams.get('run') || (url.searchParams.has('choose') ? '' : localStorage.getItem('diagnostics-run') || '');
+  const health = useResource('auth-mode', async () => expectData(await api.GET('/api/v1/health')), false);
   const identity = useResource('auth-me', async () => expectData(await api.GET('/api/v1/auth/me')), false);
   const session = useResource(`session-${run}`, async () => {
     if (!run) throw new ApiFailure(404, 'Запуск не выбран.');
@@ -111,10 +144,15 @@ export function DiagnosticsApp() {
       const link = event.target instanceof Element ? event.target.closest('a') : null;
       if (!link || link.target || link.hasAttribute('download')) return;
       const next = new URL(link.href);
-      if (next.origin !== window.location.origin || next.pathname === '/gallery' || next.pathname === '/stand' || next.pathname.startsWith('/stand/') || (next.hash && next.pathname === window.location.pathname)) return;
+      if (next.origin !== window.location.origin || next.pathname === '/gallery' || next.pathname === '/stand' || next.pathname.startsWith('/stand/') || (next.hash && next.pathname === window.location.pathname && next.search === window.location.search)) return;
+      const previous = new URL(window.location.href);
+      const previousQuery = new URLSearchParams(previous.search);
+      const nextQuery = new URLSearchParams(next.search);
+      previousQuery.delete('demoStep'); nextQuery.delete('demoStep');
+      const changingDemoStep = next.pathname === previous.pathname && previousQuery.toString() === nextQuery.toString() && next.searchParams.get('demoStep') !== previous.searchParams.get('demoStep');
       event.preventDefault();
       window.history.pushState(null, '', next);
-      updateLocation(); window.scrollTo(0, 0);
+      updateLocation(); if (!changingDemoStep) window.scrollTo(0, 0);
     };
     document.addEventListener('click', navigate);
     window.addEventListener('popstate', updateLocation);
@@ -127,7 +165,7 @@ export function DiagnosticsApp() {
     window.addEventListener('offline', disconnected);
     return () => { window.removeEventListener('online', connected); window.removeEventListener('offline', disconnected); };
   }, [identity.refresh, session.refresh]);
-  const current = route(url.pathname);
+  const current = route(url.pathname, url.search);
   const nav: NavItem[] = featureRegistrations.map(item => ({ id: item.id, href: href(item.route, run), label: item.label, icon: icons[item.id] }));
   const processing = session.data?.data.processingStatus || 'ready';
   const canShowRun = !identity.loading && identity.error?.status !== 401;
@@ -144,11 +182,12 @@ export function DiagnosticsApp() {
   }
   return <AppShell nav={nav} active={current.active} mode={session.data?.mode || null} dataTime={session.data?.dataTime || null} connection={connection}
     userLabel={identity.data?.displayName || 'Нет входа'} roleLabel={identity.data ? roleLabel[identity.data.role] : 'Просмотр'} onLogout={identity.data && online ? logout : undefined}
+    userActions={identity.data && health.data?.demoQuickLoginEnabled ? <QuickLogin currentRole={identity.data.role} disabled={!online || identity.stale} /> : undefined}
     breadcrumb={current.title} headerActions={run ? <a href="/?choose=1">Сменить набор</a> : undefined}>
     {hasStandLive() && <div className="stand-presenter-bar"><strong>Демонстрация с ведущим</strong><a href="/stand" onClick={leaveStandLive}>Вернуться к автопоказу</a></div>}
     {!online && <Banner tone="high" title="Нет сети">Показан последний загруженный срез. Изменения недоступны до восстановления связи.</Banner>}
     {identity.loading && !identity.data && <Loading label="Проверяем вход..." />}
-    {identity.error?.status === 401 && <Login onSuccess={() => window.location.reload()} />}
+    {identity.error?.status === 401 && <Login onSuccess={() => window.location.reload()} quickLogin={health.data?.demoQuickLoginEnabled === true} />}
     {identity.error && identity.error.status !== 401 && <Banner tone="high" title="Сервер недоступен">Сохраненные данные показаны как устаревшие. Изменения недоступны.</Banner>}
     {!identity.loading && identity.error?.status !== 401 && !run && identity.data && <ScenarioPicker identity={identity.data} />}
     {canShowRun && run && session.loading && !session.data && <Loading label="Загружаем запуск..." />}

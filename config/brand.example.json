@@ -36,7 +36,7 @@
     "riskQueue": true,
     "workPlans": true,
     "defectsMinimal": true,
-    "directorDashboard": false,
+    "directorDashboard": true,
     "realDeviceConnection": false,
     "externalAi": false
   },

@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-31T16:51:20.250823Z",
+  "title": "Design System: ЭнергоДиагностика",
+  "extensions": {
+    "shadows": [
+      {
+        "name": "navigation-edge",
+        "value": "1px 0 0 #082c45",
+        "purpose": "Тонкое отделение боковой навигации."
+      },
+      {
+        "name": "profile-popover",
+        "value": "0 8px 24px #102c4626",
+        "purpose": "Отделение всплывающего выбора профиля."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "navigation-collapsed",
+        "value": "1279px"
+      },
+      {
+        "name": "single-column",
+        "value": "1150px"
+      },
+      {
+        "name": "mobile-navigation",
+        "value": "1023px"
+      },
+      {
+        "name": "compact",
+        "value": "600px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Основная кнопка",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Основное действие; доступен видимый фокус.",
+      "html": "<button class=\"ds-button ds-primary\">Открыть случай</button>",
+      "css": ".ds-button { display:inline-flex; justify-content:center; align-items:center; gap:7px; min-height:38px; padding:8px 13px; border-radius:5px; border:1px solid var(--brand-primary, #0069b4); font-size:12px; font-weight:550; line-height:1.3; white-space:nowrap; cursor:pointer; } .ds-primary { background:var(--brand-primary, #0069b4); color:white; } .ds-primary:hover { filter:brightness(.94); } .ds-button:disabled { cursor:not-allowed; color:#687986; background:#edf1f4; border-color:#d6dfe6; opacity:1; } .ds-button:focus-visible { outline: 3px solid var(--brand-primary, #0069b4); outline-offset: 3px; }"
+    },
+    {
+      "name": "Вторичная кнопка",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Действие второго уровня.",
+      "html": "<button class=\"ds-button\">Открыть записи</button>",
+      "css": ".ds-button { display:inline-flex; justify-content:center; align-items:center; gap:7px; min-height:38px; padding:8px 13px; border-radius:5px; border:1px solid var(--border, #d6e2ec); background:white; color:var(--text-primary, #17334d); font-size:12px; font-weight:550; line-height:1.3; white-space:nowrap; cursor:pointer; } .ds-button:hover { background:var(--canvas, #f3f7fa); border-color:#a9c1d2; } .ds-button:focus-visible { outline: 3px solid var(--brand-primary, #0069b4); outline-offset: 3px; }"
+    },
+    {
+      "name": "Поле ввода",
+      "kind": "input",
+      "description": "Подписанное поле для ввода данных.",
+      "html": "<label class=\"ds-field\">Основание<input placeholder=\"Укажите основание\"></label>",
+      "css": ".ds-field { display:grid; gap:7px; font:550 12px Inter, \"Segoe UI\", Arial, sans-serif; color:var(--text-primary, #17334d); } .ds-field input { border:1px solid #bccdd9; background:#fff; color:var(--text-primary, #17334d); border-radius:5px; padding:10px 12px; min-height:39px; font:400 12px Inter, \"Segoe UI\", Arial, sans-serif; } .ds-field input:focus-visible { outline: 3px solid var(--brand-primary, #0069b4); outline-offset: 3px; }"
+    },
+    {
+      "name": "Навигация",
+      "kind": "nav",
+      "description": "Текущий раздел отмечен фоном и текстом.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-link\" href=\"#\">Обзор активов</a><a class=\"ds-link ds-active\" href=\"#\" aria-current=\"page\">Диагностика</a></nav>",
+      "css": ".ds-nav { background:var(--nav-background, #0b3556); padding:10px; display:grid; gap:3px; font:13px Inter, \"Segoe UI\", Arial, sans-serif; } .ds-link { min-height:42px; display:flex; align-items:center; gap:11px; padding:11px 12px; border-radius:5px; color:#d7e5ee; text-decoration:none; } .ds-link:hover { background:#ffffff0e; color:#fff; } .ds-active { background:var(--brand-primary, #0069b4); color:white; } .ds-link:focus-visible { outline: 3px solid var(--brand-primary, #0069b4); outline-offset: 3px; }"
+    },
+    {
+      "name": "Метка приоритета",
+      "kind": "chip",
+      "description": "Цвет состояния сопровождается текстом.",
+      "html": "<span class=\"ds-badge\">Высокий приоритет</span>",
+      "css": ".ds-badge { display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:4px; font:550 12px/1.25 Inter, \"Segoe UI\", Arial, sans-serif; white-space:nowrap; color:var(--risk-high-text, #b42336); background:var(--risk-high-bg, #fdecef); }"
+    },
+    {
+      "name": "Панель",
+      "kind": "card",
+      "description": "Рабочая область с заголовком и содержимым.",
+      "html": "<section class=\"ds-panel\"><header class=\"ds-heading\">Доказательства и качество</header><div class=\"ds-body\">Источники и их состояние</div></section>",
+      "css": ".ds-panel { border:1px solid #d7e3ea; border-radius:8px; background:#fff; overflow:hidden; color:var(--text-primary, #17334d); font:14px/1.45 Inter, \"Segoe UI\", Arial, sans-serif; } .ds-heading { padding:16px 20px 13px; border-bottom:1px solid #e9eff4; font-size:16px; font-weight:650; line-height:1.3; } .ds-body { padding:16px 20px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Инженерный атлас",
+    "overview": "Рабочее поле связывает временной ряд, происхождение данных и следующий шаг проверки. Светлые плоскости, темная навигация и спокойные разделители поддерживают плотную инженерную работу; состояние и доказательства не служат украшением.",
+    "keyCharacteristics": [
+      "Ясная иерархия и компактные панели.",
+      "Режим данных, виртуальное время и ограничения остаются видимыми.",
+      "Измерение, модель, качество данных и гипотеза различимы."
+    ],
+    "dos": [
+      "Do показывать режим, время данных, источник и неизвестность рядом с результатом.",
+      "Do сохранять текстовые и клавиатурные альтернативы графикам и состояниям."
+    ],
+    "donts": [
+      "Don't выдавать индекс приоритета за вероятность отказа.",
+      "Don't представлять декоративные изображения или реконструкцию как реальные доказательства."
+    ]
+  }
+}

@@ -3065,6 +3065,11 @@
             "title": "Database",
             "type": "string"
           },
+          "demoQuickLoginEnabled": {
+            "default": false,
+            "title": "Demoquickloginenabled",
+            "type": "boolean"
+          },
           "externalAiEnabled": {
             "const": false,
             "title": "Externalaienabled",
@@ -3225,6 +3230,11 @@
             "minLength": 1,
             "title": "Password",
             "type": "string"
+          },
+          "quickLogin": {
+            "default": false,
+            "title": "Quicklogin",
+            "type": "boolean"
           },
           "username": {
             "maxLength": 128,

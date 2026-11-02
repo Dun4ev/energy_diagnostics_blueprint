@@ -3,6 +3,7 @@
 import hashlib
 import json
 import unittest
+import warnings
 from pathlib import Path
 
 from packages.domain_contracts import models as m
@@ -10,6 +11,66 @@ from packages.domain_contracts import models as m
 ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = ROOT / "apps/web/public/stand-data.json"
 OBSERVATIONS = ROOT / "data/observations"
+
+
+def observation_hash_match(name: str, data: bytes, expected: str) -> str:
+    """Distinguish raw-byte equality from a uniform LF/CRLF conversion."""
+    if hashlib.sha256(data).hexdigest() == expected:
+        return "exact"
+    if Path(name).suffix.lower() not in {".json", ".jsonl"}:
+        return "mismatch"
+    try:
+        data.decode("utf-8")
+    except UnicodeDecodeError:
+        return "mismatch"
+    lf = data.replace(b"\r\n", b"\n")
+    # Do not normalize mixed endings or lone CR bytes: those are different data.
+    if b"\r" in lf or (b"\r\n" in data and b"\n" in data.replace(b"\r\n", b"")):
+        return "mismatch"
+    alternate = lf if b"\r\n" in data else lf.replace(b"\n", b"\r\n")
+    if hashlib.sha256(alternate).hexdigest() == expected:
+        return "line-endings-only"
+    return "mismatch"
+
+
+class ObservationHashTests(unittest.TestCase):
+    @staticmethod
+    def digest(data: bytes) -> str:
+        return hashlib.sha256(data).hexdigest()
+
+    def test_exact_bytes_are_distinguished_from_line_endings(self):
+        data = b'{"value": 1}\n'
+        self.assertEqual(observation_hash_match("source.json", data, self.digest(data)), "exact")
+
+    def test_uniform_line_endings_match_in_both_directions(self):
+        lf = b'{"value": 1}\n{"value": 2}\n'
+        crlf = lf.replace(b"\n", b"\r\n")
+        for name in ("source.json", "source.jsonl"):
+            with self.subTest(name=name, direction="LF to CRLF"):
+                self.assertEqual(observation_hash_match(name, lf, self.digest(crlf)), "line-endings-only")
+            with self.subTest(name=name, direction="CRLF to LF"):
+                self.assertEqual(observation_hash_match(name, crlf, self.digest(lf)), "line-endings-only")
+
+    def test_data_changes_are_not_accepted_as_line_ending_changes(self):
+        expected = self.digest(b'{"value": 1}\r\n')
+        self.assertEqual(observation_hash_match("source.json", b'{"value": 2}\n', expected), "mismatch")
+
+    def test_binary_and_other_formats_require_exact_bytes(self):
+        data = b"binary\n"
+        for name in ("source.csv.gz", "source.bin", "source.csv"):
+            with self.subTest(name=name):
+                self.assertEqual(observation_hash_match(name, data, self.digest(b"binary\r\n")), "mismatch")
+                self.assertEqual(observation_hash_match(name, data, self.digest(data)), "exact")
+
+    def test_invalid_utf8_and_mixed_line_endings_do_not_normalize(self):
+        cases = (
+            (b"\xff\n", b"\xff\r\n"),
+            (b"a\r\nb\nc\n", b"a\r\nb\r\nc\r\n"),
+            (b"a\rb\n", b"a\rb\r\n"),
+        )
+        for data, alternate in cases:
+            with self.subTest(data=data):
+                self.assertEqual(observation_hash_match("source.json", data, self.digest(alternate)), "mismatch")
 
 
 class StandPackageTests(unittest.TestCase):
@@ -66,8 +127,20 @@ class StandPackageTests(unittest.TestCase):
         self.assertEqual(provenance["seed"], 20260925)
         self.assertEqual(provenance["policyVersion"], "demo-policy-0.1.0")
         self.assertEqual(provenance["modelVersion"], "deterministic-thermal-0.1.0")
-        for name, digest in provenance["observationHashes"].items():
-            self.assertEqual(hashlib.sha256((OBSERVATIONS / name).read_bytes()).hexdigest(), digest)
+        hashes = provenance["observationHashes"]
+        self.assertTrue(hashes, "Observation hashes must not be empty")
+        self.assertEqual(set(hashes), {path.name for path in OBSERVATIONS.iterdir() if path.is_file()})
+        for name, digest in hashes.items():
+            data = (OBSERVATIONS / name).read_bytes()
+            match = observation_hash_match(name, data, digest)
+            self.assertNotEqual(match, "mismatch", f"Observation hash mismatch: {name}")
+            if match == "line-endings-only":
+                warnings.warn(
+                    f"{name}: raw SHA-256 differs (recorded={digest}, "
+                    f"current={hashlib.sha256(data).hexdigest()}); "
+                    "only a uniform LF/CRLF conversion matches the recorded bytes",
+                    stacklevel=2,
+                )
         text = json.dumps(self.pack, ensure_ascii=False).lower()
         for forbidden in ("csrftoken", "password", "sessiontoken", "data/truth", "true_fault"):
             self.assertNotIn(forbidden, text)

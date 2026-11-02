@@ -1,0 +1,23 @@
+.case-summary { display: grid; gap: 12px; min-width: 0; }
+.case-summary-context { display: flex; flex-wrap: wrap; gap: 6px 20px; color: var(--text-secondary); font-size: 12px; }
+.case-summary-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+.case-summary-section { display: grid; align-content: start; gap: 12px; min-width: 0; padding: 20px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface, #fff); scroll-margin-top: 24px; overflow-wrap: anywhere; }
+.case-summary-section.is-tour-active { outline: 2px solid var(--text-primary); outline-offset: 3px; }
+.case-summary-section h2 { margin: 0 0 2px; }
+.case-summary-section p { max-width: 72ch; }
+.case-summary-muted { color: var(--text-secondary); }
+.case-summary-status { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.case-summary-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 18px; margin: 0; }
+.case-summary-metrics dt { color: var(--text-secondary); font-size: 12px; }
+.case-summary-metrics dd { margin: 3px 0 0; font-size: 18px; font-weight: 650; }
+.case-summary-list { display: grid; gap: 12px; list-style: none; padding: 0; margin: 0; }
+.case-summary-list li > span, .case-summary-list li > strong { display: block; }
+.case-summary-list li > span { margin-top: 3px; }
+.case-summary-bullets { list-style: revert; padding-left: 20px; }
+.case-summary-evidence { background: none; border: 0; padding: 0; color: var(--brand-primary); text-align: left; text-decoration: underline; text-underline-offset: 3px; }
+.case-summary-evidence:hover { text-decoration-thickness: 2px; }
+.case-summary-plans { display: grid; gap: 10px; border-top: 1px solid var(--border); padding-top: 16px; margin-top: 4px; }
+.case-summary-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+@media (min-width: 1150px) { .case-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { .case-summary-section { padding: 16px; } }
+@media print { .case-summary-section { break-inside: avoid; } .case-summary-section.is-tour-active { outline: none; } .case-summary-actions { display: none; } }
